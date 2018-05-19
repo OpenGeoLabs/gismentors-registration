@@ -37,7 +37,7 @@ def submit(request, course_id):
 
     found_attendes = Attendee.objects.filter(email=request.POST["email_attendee"])
 
-    if "gdpr" in request.POST and request.POST["gdpr"] == on:
+    if "gdpr" in request.POST and request.POST["gdpr"] == "on":
         gdpr = True
     else:
         raise Exception("GDPR musí být odsouhlaseno")
