@@ -1,0 +1,50 @@
+
+{% extends "template.html" %}
+{% block body %}
+{{ block.super }}
+<h2>Seznam pořádaných kurzů</h2>
+{% if latest_courses_list %}
+    <table class="table table-striped">
+    <thead class="thead-light">
+     <tr>
+          <th>Datum</th>
+          <th>Místo</th>
+          <th>Kurz</th>
+          <th>Úroveň</th>
+          <th>Včasná registrace</th>
+          <th>Závazná přihláška</th>
+         </tr>
+    <tbody>
+    {% for course in latest_courses_list %}
+        <tr>
+            <td>
+                {{ course.date }}
+            </td>
+            <td>
+                {{ course.location.address.organisation }},
+                {{ course.location.address.city }}
+            </td>
+            <td>
+                {{ course.course_type.title }}
+            </td>
+            <td>
+                {% for key, value in level_choices %}
+                    {% if key == course.course_type.level %}
+                        {{ value }}
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {{ course.early_date }}
+            </td>
+            <td>
+                    <a href="{% url 'course' course.id %}">Závazná přihláška</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+{% else %}
+    <p>No courses are available.</p>
+{% endif %}
+{% endblock %}

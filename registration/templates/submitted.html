@@ -1,0 +1,11 @@
+{% extends "template.html" %}
+
+{% block body %}
+{{ block.super }}
+
+<h1>Úspěšné přihlášení</h1>
+<p>
+Děkujeme Vám za přihlášení na kurz GISMentors <em>{{ course_name }}</em>, který
+se bude konat <em>{{ course_date }}</em>.
+</p>
+{% endblock %}

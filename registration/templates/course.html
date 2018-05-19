@@ -1,0 +1,176 @@
+{% extends "template.html" %}
+
+{% block body %}
+{{ block.super }}
+
+<div class="card">
+  <div class="card-body">
+<h2>{{ course.course_type.title }}</h2>
+<h3>Úroveň: {{ level }}</h3>
+<form action="{% url 'submit' course.id %}" method="post" class="needs-validation" validate>
+{% csrf_token %}
+
+<div class="card border-light">
+    <div class="card-header">
+        <h3>Cena</h3>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <tbody>
+                <tr><td>Včasná registrace</td><td>{{ course.price.vat_regular }},- Kč</td></tr>
+                <tr><td>Plná registrace</td><td>{{ course.price.vat_late }},- Kč</td></tr>
+                <tr><td>Studenti</td><td>{{ course.price.vat_student }},- Kč</td></tr>
+            </tbody>
+        </table>
+        Ceny jsou uvedeny včetně DPH. Ceny jsou smluvní, změna vyhrazena.
+        Hromadné slevy jsou možné po domluvě s organizátory.
+    </div>
+</div>
+<div class="card border-light">
+    <div class="card-header">
+        <h3>Místo konání</h3>
+    </div>
+    <div class="card-body">
+        <address>
+        {{ course.location.address.organisation }}</br>
+        {{ course.location.address.street }}</br>
+        {{ course.location.address.postal_code }} -
+        {{ course.location.address.city }}</br>
+        </address>
+    </div>
+</div>
+
+<div >
+    <div class="card border-light">
+    <fieldset>
+        <div class="card-header">
+            <legend>Kontaktní údaje</legend>
+        </div>
+        <div class="card-body">
+            <div class="form-group mb-2 mr-sm-2">
+                <label class="form-control-label" for="name">Jméno a příjmení</label>
+                <input type="text" class="form-control" name="name" id="name" required="true" />
+            </div>
+            <div class="form-group">
+                <label for="email_attendee">e-mail účastníka</label>
+                <input class="form-control" aria-describedby="attendeeEmail" type="email_attendee" name="email_attendee" id="email_attendee" required="true" />
+                <small id="attendeeEmail" class="form-text text-muted">Prostřednictvím tohoto e-mailu s
+                vámi budeme řešit organizační záležitosti kurzu.</small>
+            </div>
+        </div>
+    </fieldset>
+    </div>
+    <div class="card border-light">
+    <fieldset>
+        <div class="card-header">
+            <legend>Fakturační údaje</legend>
+        </div>
+        <div class="card-body">
+                <div class="form-group">
+                    <label for="organisation">Organizace</label>
+                    <input type="text" class="form-control" name="organisation" id="organisation" />
+                </div>
+                <div class="form-group">
+                    <label for="street">Ulice a číslo popisné</label>
+                    <input type="text" class="form-control" name="street" id="street" required="true" />
+                </div>
+                <div class="form-group">
+                    <label for="city">Město</label>
+                    <input type="text" class="form-control" name="city" id="city" required="true" />
+                </div>
+                <div class="form-group">
+                    <label for="zip">PSČ</label>
+                    <input type="text" class="form-control" name="zip" id="zip" required="true" />
+                </div>
+                <div class="form-group">
+                    <label for="ico">IČ</label>
+                    <input type="text" class="form-control" name="ico" id="ico" />
+                </div>
+                <div class="form-group">
+                    <label for="dic">DIČ</label>
+                    <input type="text" class="form-control" name="dic" id="dic" />
+                </div>
+                <div class="form-group">
+                    <label for="order">Číslo objednávky</label>
+                    <input type="text" class="form-control" name="order" id="order" />
+                </div>
+                <div class="form-group">
+                    <label for="email">fakturační e-mail</label>
+                    <input type="email" class="form-control" aria-describedby="invoiceEmail" name="email" id="email" />
+                    <small id="invoiceEmail" class="form-text text-muted">
+                    Pokud se liší od e-mailu účastníka
+                    </small>
+                </div>
+        </div>
+    </fieldset>
+    </div>
+    <div class="card border-light">
+            <fieldset>
+                <div class="card-header">
+                    <legend>Doplňující otázky</legend>
+                </div>
+                <div class="card-body">
+                        <div class="form-group">
+                            <label for="level">V oblasti GIS se považuji za</label>
+                            <select id="level" name="level" class="custom-select form-control" required="true">
+                                {% for option in level_options %}
+                                <option value="{{ option.0 }}">{{ option.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            <br />
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="student" id="student" />
+                            <label class="form-check-label" for="student">Prohlašuji čestně, že jsem student zapsaný v denním studijním programu.</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="temata">Témata na tento kurz</label>
+                            <input aria-describedby="topics" class="form-control" type="text" name="temata" id="temata" />
+                            <small id="topics" class="form-text text-muted">
+                            Máte nějaké téma, které byste rádi na kurzu probrali?
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label for="temata_next">Témata na další kurzy</label>
+                            <input aria-describedby="next_topics" class="form-control" type="text" name="temata_next" id="temata_next" />
+                            <small id="next_topics" class="form-text text-muted">
+                            Zajímá Vás nějaký širší okruh, na který jsme zatím nevypsali školení?
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label for="note">Poznámka pro organizátory</label>
+                            <input class="form-control" type="text" name="note" id="note" />
+                        </div>
+                    </div>
+            </fieldset>
+    </div>
+    <div class="card border-light">
+            <fieldset>
+                <div class="card-header">
+                    <legend>GDPR a ochrana osobních údajů</legend>
+                </div>
+                <div class="card-body">
+                        <div class="form-check">
+                            <input aria-describedby="gdpr" class="form-check-input" type="checkbox" name="gdpr" id="gdpr" required="true" />
+                            <label class="form-check-label" for="gdpr">Ochrana osobních údajů</label>
+                            <small id="gdpr" class="form-text text-muted">
+                            Souhlasím se zpracováním poskytnutých osobních údajů a zařazením do databáze uživatelů společnosti OpenGeoLabs s.r.o. se sídlem v Brandlova 1559/7, Praha 11, 149 00 (dále jen OpenGeoLabs s.r.o.) pro vlastní použití v souladu s příslušnými ustanoveními zákona c. 101 / 2000 Sb. O ochraně osobních údajů a o změně některých údajů v platném znění. Beru na vědomí, že údaje budou využívány pouze v rámci společnosti OpenGeoLabs s.r.o.. Jsem si vědom/a toho, že souhlas s jejich zpracováním mohu kdykoliv odvolat zasláním e-mailu na adresu info [zavináč] opengeolabs [tečka] cz. Souhlas bude automaticky prodloužen vždy o další roční období, pokud nedojde k jeho odvolání písemnou formou. Jsem si vědom/a svých práv, které subjektům poskytuje zákon 101/2000 Sb., o ochraně osobních údajů. Vaše data budou použita pro potřeby organizace školení GISMentors.
+                            </small>
+                        </div>
+                        <div class="form-check">
+                            <input aria-describedby="marketing" class="form-check-input" type="checkbox" name="marketing" id="marketing" />
+                            <label class="form-check-label" for="gdpr">Marketingová sdělení</label>
+                            <small id="marketing" class="form-text text-muted">
+                            Souhlasím s tím, že společnost <a href="http://opengeolabs.cz">OpenGeoLabs s.r.o.</a> může využít můj e-mail pro zaslání krátké marketingové zprávy (ne častěji, než čtyřikrát za rok), obsahující informace o aktuálním dění ve společnosti. Jsem si vědom/a toho, že souhlas použití mého e-mailu pro marketingové účely mohu kdykoliv odvolat zasláním e-mailu na adresu info [zavináč] opengeolabs [tečka] cz. Souhlas bude automaticky prodloužen vždy o další roční období, pokud nedojde k jeho odvolání písemnou formou. Jsem si vědom/a svých práv, které subjektům poskytuje zákon 101/2000 Sb., o ochraně osobních údajů. Na základě tohoto souhlasu budeme zpracovávat vaše kontaktní údaje, údaje o obsolvovaných kurzech u nás.
+                            </small>
+                        </div>
+                    </div>
+            </fieldset>
+        </div>
+</div>
+<button class="btn btn-primary mb-2" type="submit">Odeslat závaznou přihlášku</button>
+</form>
+
+{% endblock %}
+  </div>
+</div>
