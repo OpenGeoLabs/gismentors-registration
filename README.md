@@ -73,6 +73,17 @@ python manage.py makemigrations registration
 python manage.py migrate
 ```
 
+## Add url
+
+to `gismentors/urls.py` add `registration.urls`:
+
+```
+urlpatterns = [
+    ...
+    url(r'^courses/', include('registration.urls')),
+]
+```
+
 ## Testing
 
 ```
