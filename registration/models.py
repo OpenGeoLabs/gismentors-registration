@@ -268,14 +268,16 @@ class CourseAttendee(models.Model):
     student = models.BooleanField(
             verbose_name=_("Student"))
 
-    level = models.IntegerField(
-            choices=(
+    level_choices = (
                 (0, "Začátečník"),
                 (1, "Mírně pokročilý"),
                 (2, "Běžně pracuji s nástroji GIS"),
                 (3, "GIS profesionál"),
-            ),
-            verbose_name=_("Úroveň"))
+            )
+
+    level = models.IntegerField(
+            verbose_name=_("Úroveň"),
+            choices=level_choices)
 
     note = models.TextField(
             verbose_name=_("Poznámka"))

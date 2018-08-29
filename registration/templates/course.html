@@ -5,38 +5,33 @@
 
 <div class="card">
   <div class="card-body">
-<h2>{{ course.course_type.title }}</h2>
-<h3>Úroveň: {{ level }}</h3>
+<h1>Závazná přihláška na kurz {{ course.course_type.title }}</h1>
+<br>
+<h4>Úroveň: {{ level }}
+<a href="{{ course.course_type.detail }}" target="_blank">Detaily kurzu</a></h4>
+<h4>Datum: {{ course.date }}</h4>
+<h4>Místo konání: {{ course.location.address.organisation }},
+  {{ course.location.address.street }}, {{ course.location.address.city }}
+  <a href="https://osm.org/go/0J0ajhhQa--?way=99013221" target="_blank">Mapa</a></h4>
+
 <form action="{% url 'submit' course.id %}" method="post" class="needs-validation" validate>
 {% csrf_token %}
 
+<br>
 <div class="card border-light">
     <div class="card-header">
-        <h3>Cena</h3>
+        <legend>Cena kurzu</legend>
     </div>
     <div class="card-body">
         <table class="table">
             <tbody>
-                <tr><td>Včasná registrace</td><td>{{ course.price.vat_regular }},- Kč</td></tr>
-                <tr><td>Plná registrace</td><td>{{ course.price.vat_late }},- Kč</td></tr>
-                <tr><td>Studenti</td><td>{{ course.price.vat_student }},- Kč</td></tr>
+                <tr><td>{{ course.price.vat_late }},- Kč</td><td>plná cena</td></tr>
+                <tr><td>{{ course.price.vat_regular }},- Kč</td><td>při včasné registraci do {{ course.early_date }}</td></tr>
+                <tr><td>{{ course.price.vat_student }},- Kč</td><td>studenti při registarci do {{ course.early_date }} (maximálně 5 míst) </td></tr>
             </tbody>
         </table>
-        Ceny jsou uvedeny včetně DPH. Ceny jsou smluvní, změna vyhrazena.
-        Hromadné slevy jsou možné po domluvě s organizátory.
-    </div>
-</div>
-<div class="card border-light">
-    <div class="card-header">
-        <h3>Místo konání</h3>
-    </div>
-    <div class="card-body">
-        <address>
-        {{ course.location.address.organisation }}</br>
-        {{ course.location.address.street }}</br>
-        {{ course.location.address.postal_code }} -
-        {{ course.location.address.city }}</br>
-        </address>
+        <small id="prices" class="form-text text-muted">Ceny jsou uvedeny včetně DPH. Ceny jsou smluvní, změna vyhrazena.
+        Hromadné slevy jsou možné po domluvě s organizátory.</small>
     </div>
 </div>
 
@@ -48,11 +43,11 @@
         </div>
         <div class="card-body">
             <div class="form-group mb-2 mr-sm-2">
-                <label class="form-control-label" for="name">Jméno a příjmení</label>
+                <label class="form-control-label" for="name">Jméno a příjmení účastníka</label>
                 <input type="text" class="form-control" name="name" id="name" required="true" />
             </div>
             <div class="form-group">
-                <label for="email_attendee">e-mail účastníka</label>
+                <label for="email_attendee">E-mail účastníka</label>
                 <input class="form-control" aria-describedby="attendeeEmail" type="email_attendee" name="email_attendee" id="email_attendee" required="true" />
                 <small id="attendeeEmail" class="form-text text-muted">Prostřednictvím tohoto e-mailu s
                 vámi budeme řešit organizační záležitosti kurzu.</small>
@@ -95,7 +90,7 @@
                     <input type="text" class="form-control" name="order" id="order" />
                 </div>
                 <div class="form-group">
-                    <label for="email">fakturační e-mail</label>
+                    <label for="email">Fakturační e-mail</label>
                     <input type="email" class="form-control" aria-describedby="invoiceEmail" name="email" id="email" />
                     <small id="invoiceEmail" class="form-text text-muted">
                     Pokud se liší od e-mailu účastníka
@@ -110,6 +105,11 @@
                     <legend>Doplňující otázky</legend>
                 </div>
                 <div class="card-body">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="student" id="student" />
+                            <label class="form-check-label" for="student">Prohlašuji čestně, že jsem student zapsaný v denním studijním programu.</label>
+                        </div>
+                        <br>
                         <div class="form-group">
                             <label for="level">V oblasti GIS se považuji za</label>
                             <select id="level" name="level" class="custom-select form-control" required="true">
@@ -119,10 +119,7 @@
                             </select>
                             <br />
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="student" id="student" />
-                            <label class="form-check-label" for="student">Prohlašuji čestně, že jsem student zapsaný v denním studijním programu.</label>
-                        </div>
+
                         <div class="form-group">
                             <label for="temata">Témata na tento kurz</label>
                             <input aria-describedby="topics" class="form-control" type="text" name="temata" id="temata" />

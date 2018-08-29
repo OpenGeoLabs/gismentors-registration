@@ -21,10 +21,10 @@ def courses(request):
 
 def course(request, course_id):
     course = get_object_or_404(CourseEvent, pk=course_id)
-    level_options = course.course_type.level_choices
+    level_options = CourseAttendee.level_choices
     context = {
             "course": course,
-            "level_options": level_options, 
+            "level_options": level_options,
             "level": course.course_type.level_choices[course.course_type.level][1]
             }
     return render(request, "course.html", context)

@@ -2,15 +2,15 @@
 {% extends "template.html" %}
 {% block body %}
 {{ block.super }}
-<h2>Seznam pořádaných kurzů</h2>
+<h2>Nadcházející kurzy</h2>
 {% if latest_courses_list %}
     <table class="table table-striped">
     <thead class="thead-light">
      <tr>
-          <th>Datum</th>
-          <th>Místo</th>
           <th>Kurz</th>
           <th>Úroveň</th>
+          <th>Datum</th>
+          <th>Místo</th>
           <th>Včasná registrace</th>
           <th>Závazná přihláška</th>
          </tr>
@@ -18,14 +18,7 @@
     {% for course in latest_courses_list %}
         <tr>
             <td>
-                {{ course.date }}
-            </td>
-            <td>
-                {{ course.location.address.organisation }},
-                {{ course.location.address.city }}
-            </td>
-            <td>
-                {{ course.course_type.title }}
+                <a href="{{ course.course_type.detail }}" target="_blank">{{ course.course_type.title }}</a>
             </td>
             <td>
                 {% for key, value in level_choices %}
@@ -35,10 +28,17 @@
                 {% endfor %}
             </td>
             <td>
+                {{ course.date }}
+            </td>
+            <td>
+                {{ course.location.address.organisation }},
+                {{ course.location.address.city }}
+            </td>
+            <td>
                 {{ course.early_date }}
             </td>
             <td>
-                    <a href="{% url 'course' course.id %}">Závazná přihláška</a>
+                    <a href="{% url 'course' course.id %}" target="_blank">Závazná přihláška</a>
             </td>
         </tr>
     {% endfor %}
