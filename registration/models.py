@@ -128,6 +128,21 @@ class CourseEvent(models.Model):
             CourseType,
             on_delete=models.DO_NOTHING)
 
+    CREATED = "created"
+    PUBLISHED = "published"
+    CLOSED = "closed"
+    DECLINED = "declined"
+
+    status_choices = (
+        (CREATED, "Vytvořený"),
+        (PUBLISHED, "Publikovaný"),
+        (CLOSED, "Uzavřený"),
+        (DECLINED, "Zrušený"),
+    )
+
+    status = models.CharField(max_length=10, choices=status_choices,
+                              default=CREATED)
+
     date = models.DateField(
             verbose_name=_("Datum")
     )
@@ -243,7 +258,6 @@ class Attendee(models.Model):
             údaje o obsolvovaných kurzech u nás.
             """))
 
-
     date_signed = models.DateField(
             auto_now=True)
 
@@ -260,6 +274,10 @@ class CourseAttendee(models.Model):
             "Attendee",
             on_delete=models.CASCADE
             )
+
+    date_signed = models.DateField(
+        verbose_name=_("Datum přihlášení")
+    )
 
     course = models.ForeignKey(
             CourseEvent,

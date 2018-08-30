@@ -78,6 +78,8 @@ python manage.py migrate
 to `gismentors/urls.py` add `registration.urls`:
 
 ```
+from django.conf.urls import url
+
 urlpatterns = [
     ...
     url(r'^courses/', include('registration.urls')),

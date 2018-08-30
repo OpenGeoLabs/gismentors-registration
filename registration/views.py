@@ -43,15 +43,16 @@ def submit(request, course_id):
         raise Exception("GDPR musí být odsouhlaseno")
 
     if found_attendes:
-        found_attendes[0].name=request.POST["name"]
-        found_attendes[0].date_signed=datetime.date.today()
+        found_attendes[0].name = request.POST["name"]
+        found_attendes[0].date_signed = datetime.date.today()
         found_attendes[0].save()
         attendee = found_attendes[0]
-        course_attendees = CourseAttendee.objects.filter(attendee = attendee)
+        course_attendees = CourseAttendee.objects.filter(attendee=attendee)
         if course_attendees:
             course_attendee = course_attendees[0]
+            attendee.courses.add(course)
     else:
-        if "marketing" in request.POST and request.POST["marketing"] == on:
+        if "marketing" in request.POST and request.POST["marketing"] == "on":
             marketing = True
         else:
             marketing = False
@@ -75,6 +76,7 @@ def submit(request, course_id):
                 attendee=attendee,
                 course=course,
                 student=student,
+                date_signed=datetime.date.today(),
                 level=request.POST["level"],
                 note=request.POST["note"],
                 topics=request.POST["temata"],
@@ -83,11 +85,9 @@ def submit(request, course_id):
         )
         course_attendee.save()
 
-
     context = {
-            "course_name":course.course_type.title,
-            "course_date":course.date
+            "course_name": course.course_type.title,
+            "course_date": course.date
     }
-
 
     return render(request, "submitted.html", context)
