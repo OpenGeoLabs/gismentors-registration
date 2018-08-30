@@ -4,19 +4,26 @@ from leaflet.admin import LeafletGeoAdmin
 from .models import CourseType
 from .models import Location
 from .models import CourseEvent
-from .models import InvoiceDetails
+from .models import InvoiceDetail
 from .models import Attendee
 from .models import CourseAttendee
 from .models import Address
 from .models import Price
 
-# Register your models here.
 
 class AddressInline(admin.StackedInline):
-    model=Address
+    model = Address
+
 
 class PriceInline(admin.StackedInline):
-    model=Price
+    model = Price
+
+
+class CourseAttendeeInline(admin.StackedInline):
+    model = CourseAttendee
+    fields = ("attendee", )
+    extra = 0
+
 
 class LocationAdmin(LeafletGeoAdmin):
     inlines = (AddressInline, )
@@ -24,9 +31,11 @@ class LocationAdmin(LeafletGeoAdmin):
     default_lon = 1730000
     default_lat = 6430000
 
+
 class AttendeeAdmin(admin.ModelAdmin):
     list_display = ("name", "email", "date_signed")
-    readonly_fields=('courses',)
+    readonly_fields = ('courses',)
+
 
 class CourseAdmin(admin.ModelAdmin):
     inlines = (PriceInline, )
@@ -35,32 +44,29 @@ class CourseAdmin(admin.ModelAdmin):
     def attendees(self, course_event):
         return course_event.courseattendee_set.count()
 
+
 class CourseAttendeeAdmin(admin.ModelAdmin):
-    list_display = ("attendee", "course", "student", "level", "invoice", "certificate")
+    list_display = ("attendee", "course", "student", "level", "certificate")
 
     def attendee(self, course_event):
         return course_event.attendee.name
 
-class InvoiceDetailsAdmin(admin.ModelAdmin):
-    list_display = ("attendee", "course", "student", "invoice")
 
-    def attendee(self, invoice_detail):
-        return invoice_detail.course_attendee.attendee.name
+class InvoiceDetailAdmin(admin.ModelAdmin):
+    list_display = ("organisation", "invoice")
+    inlines = (CourseAttendeeInline, )
 
-    def course(self, invoice_detail):
-        return invoice_detail.course_attendee.course.course_type.title
-
-    def student(self, invoice_detail):
-        return invoice_detail.course_attendee.student
+    def organisation(self, invoice_detail):
+        return invoice_detail.org
 
     def invoice(self, invoice_detail):
-        return invoice_detail.course_attendee.student
+        return invoice_detail.invoice
 
 
 admin.site.register(CourseType)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(CourseEvent, CourseAdmin)
-admin.site.register(InvoiceDetails, InvoiceDetailsAdmin)
+admin.site.register(InvoiceDetail, InvoiceDetailAdmin)
 admin.site.register(Attendee, AttendeeAdmin)
 admin.site.register(CourseAttendee, CourseAttendeeAdmin)
 admin.site.register(Price)

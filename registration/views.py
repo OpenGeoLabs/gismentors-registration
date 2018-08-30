@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.template import loader
+from django.core.mail import send_mail
 
 import datetime
 
@@ -8,8 +9,8 @@ from .models import CourseType
 from .models import CourseEvent
 from .models import Attendee
 from .models import CourseAttendee
+from .models import InvoiceDetail
 
-# Create your views here.
 
 def courses(request):
     latest_courses_list = CourseEvent.objects.order_by('date')[:5]
@@ -85,9 +86,35 @@ def submit(request, course_id):
         )
         course_attendee.save()
 
+    invoice_detail = InvoiceDetail(
+        address="{street}\n{zipcode} - {city}".format(
+            street=request.POST["street"], zipcode=request.POST["zip"],
+            city=request.POST["city"]),
+        org=request.POST["organisation"],
+        ico=request.POST["ico"],
+        dic=request.POST["dic"],
+        objednavka=request.POST["order"],
+        email=request.POST["email"],
+    )
+
+    invoice_detail.save()
+    invoice_detail.course_attendees.add(course_attendee)
+
     context = {
             "course_name": course.course_type.title,
             "course_date": course.date
     }
+
+    # TODO: send confirmation mail
+    # TODO: send mail to courses@gismentors.cz with information about new
+    # registration
+
+    #send_mail(
+    #    'Od Djanga',
+    #    'Účastník přihlášen',
+    #    'jachym@chvostokok',
+    #    ['jachym@chvostoskok'],
+    #    fail_silently=False,
+    #)
 
     return render(request, "submitted.html", context)

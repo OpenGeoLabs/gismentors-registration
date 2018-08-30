@@ -165,15 +165,11 @@ class CourseEvent(models.Model):
     def __str__(self):
         return self.course_type.__str__()
 
-class InvoiceDetails(models.Model):
+
+class InvoiceDetail(models.Model):
     class Meta:
         verbose_name = _("Fakturační údaje")
         verbose_name_plural = _("Fakturační údaje")
-
-    course_attendee = models.ForeignKey(
-            "CourseAttendee",
-            on_delete=models.CASCADE)
-
 
     address = models.TextField(
             verbose_name=_("Fakturační adresa"))
@@ -205,8 +201,17 @@ class InvoiceDetails(models.Model):
     email = models.EmailField(
             verbose_name=_("Kontaktní e-mail"))
 
-    def __str__(self):
-        return self.course_attendee.attendee.name
+    invoice = models.FileField(
+            blank=True,
+            verbose_name=_("Faktura"))
+
+
+    #def __str__(self):
+    #    if len(self.course_attendees) > 1:
+    #        return self.org
+    #    else:
+    #        return self.course_attendees[0].attendee.name
+
 
 class Attendee(models.Model):
     class Meta:
@@ -275,6 +280,7 @@ class CourseAttendee(models.Model):
             on_delete=models.CASCADE
             )
 
+
     date_signed = models.DateField(
         verbose_name=_("Datum přihlášení")
     )
@@ -312,13 +318,13 @@ class CourseAttendee(models.Model):
             blank=True,
             verbose_name=_("Certifikát"))
 
-    invoice = models.FileField(
-            blank=True,
-            verbose_name=_("Faktura"))
-
     token = models.TextField(
-                default=uuid.uuid4(),
-            verbose_name=_("Token"))
+        default=uuid.uuid4(),
+        verbose_name=_("Token"))
+
+    invoice_detail = models.ForeignKey(
+        "InvoiceDetail",
+        on_delete=models.PROTECT)
 
     def __str__(self):
         return self.attendee.name
