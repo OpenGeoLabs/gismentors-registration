@@ -4,7 +4,7 @@ from django.contrib.gis.db import models as gismodels
 import uuid
 
 
-# Create your models here.
+VAT=1.21
 
 class CourseType(models.Model):
     class Meta:
@@ -79,44 +79,6 @@ class Location(models.Model):
     def __str__(self):
         return self.address.organisation
 
-class Price(models.Model):
-    class Meta:
-        verbose_name = _("Cena kurzu")
-        verbose_name_plural = _("Ceny kurzů")
-
-    VAT=1.21
-
-    regular = models.IntegerField(
-            verbose_name="Včasná registrace",
-            help_text="Kč, bez DPH"
-    )
-    late = models.IntegerField(
-            verbose_name="Standardní",
-            help_text="Kč, bez DPH"
-    )
-    student = models.IntegerField(
-            verbose_name="Studentská",
-            help_text="Kč, bez DPH"
-    )
-
-    course = models.OneToOneField("CourseEvent",
-            on_delete=models.CASCADE)
-
-    @property
-    def vat_regular(self):
-        return int(self.VAT*self.regular)
-
-    @property
-    def vat_late(self):
-        return int(self.VAT*self.late)
-
-    @property
-    def vat_student(self):
-        return int(self.VAT*self.student)
-
-    def __str__(self):
-        return "{} | {} | {}".format(self.regular, self.late, self.student)
-
 
 class CourseEvent(models.Model):
 
@@ -162,19 +124,47 @@ class CourseEvent(models.Model):
         verbose_name=_("Poznámka ke kurzu")
     )
 
+    price_regular = models.IntegerField(
+            verbose_name="Včasná registrace",
+            help_text="Kč, bez DPH"
+    )
+
+    price_late = models.IntegerField(
+            verbose_name="Standardní",
+            help_text="Kč, bez DPH"
+    )
+
+    price_student = models.IntegerField(
+            verbose_name="Studentská",
+            help_text="Kč, bez DPH"
+    )
+
+    @property
+    def vat_regular(self):
+        global VAT
+        return int(VAT*self.price_regular)
+
+    @property
+    def vat_late(self):
+        return int(VAT*self.price_late)
+
+    @property
+    def vat_student(self):
+        return int(VAT*self.price_student)
+
     def __str__(self):
         return self.course_type.__str__()
 
 
 class InvoiceDetail(models.Model):
     class Meta:
-        verbose_name = _("Fakturační údaje")
-        verbose_name_plural = _("Fakturační údaje")
+        verbose_name = _("Faktura")
+        verbose_name_plural = _("Faktury")
 
     address = models.TextField(
             verbose_name=_("Fakturační adresa"))
 
-    org = models.CharField(
+    name = models.CharField(
             null=True,
             blank=True,
             max_length=64,
@@ -201,16 +191,18 @@ class InvoiceDetail(models.Model):
     email = models.EmailField(
             verbose_name=_("Kontaktní e-mail"))
 
+    amount = models.EmailField(
+            verbose_name=_("Částka"), help_text="Částka bez DPH")
+
     invoice = models.FileField(
             blank=True,
             verbose_name=_("Faktura"))
 
-
-    #def __str__(self):
-    #    if len(self.course_attendees) > 1:
-    #        return self.org
-    #    else:
-    #        return self.course_attendees[0].attendee.name
+    def __str__(self):
+        if self.name == None:
+            str(self.id)
+        else:
+            return self.name
 
 
 class Attendee(models.Model):
@@ -280,8 +272,7 @@ class CourseAttendee(models.Model):
             on_delete=models.CASCADE
             )
 
-
-    date_signed = models.DateField(
+    registration_date = models.DateField(
         verbose_name=_("Datum přihlášení")
     )
 

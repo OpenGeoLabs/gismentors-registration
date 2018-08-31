@@ -25,9 +25,9 @@
     <div class="card-body">
         <table class="table">
             <tbody>
-                <tr><td>{{ course.price.vat_late }},- Kč</td><td>plná cena</td></tr>
-                <tr><td>{{ course.price.vat_regular }},- Kč</td><td>při včasné registraci do {{ course.early_date }}</td></tr>
-                <tr><td>{{ course.price.vat_student }},- Kč</td><td>studenti při registarci do {{ course.early_date }} (maximálně 5 míst) </td></tr>
+                <tr><td>{{ course.vat_late }},- Kč</td><td>plná cena</td></tr>
+                <tr><td>{{ course.vat_regular }},- Kč</td><td>při včasné registraci do {{ course.early_date }}</td></tr>
+                <tr><td>{{ course.vat_student }},- Kč</td><td>studenti při registarci do {{ course.early_date }} (maximálně 5 míst) </td></tr>
             </tbody>
         </table>
         <small id="prices" class="form-text text-muted">Ceny jsou uvedeny včetně DPH. Ceny jsou smluvní, změna vyhrazena.

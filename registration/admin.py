@@ -8,20 +8,16 @@ from .models import InvoiceDetail
 from .models import Attendee
 from .models import CourseAttendee
 from .models import Address
-from .models import Price
 
 
 class AddressInline(admin.StackedInline):
     model = Address
 
 
-class PriceInline(admin.StackedInline):
-    model = Price
-
-
 class CourseAttendeeInline(admin.StackedInline):
     model = CourseAttendee
     fields = ("attendee", )
+    readonly_fields = ("attendee", )
     extra = 0
 
 
@@ -38,7 +34,6 @@ class AttendeeAdmin(admin.ModelAdmin):
 
 
 class CourseAdmin(admin.ModelAdmin):
-    inlines = (PriceInline, )
     list_display = ("course_type", "date", "attendees")
 
     def attendees(self, course_event):
@@ -57,7 +52,7 @@ class InvoiceDetailAdmin(admin.ModelAdmin):
     inlines = (CourseAttendeeInline, )
 
     def organisation(self, invoice_detail):
-        return invoice_detail.org
+        return invoice_detail.name
 
     def invoice(self, invoice_detail):
         return invoice_detail.invoice
@@ -69,4 +64,3 @@ admin.site.register(CourseEvent, CourseAdmin)
 admin.site.register(InvoiceDetail, InvoiceDetailAdmin)
 admin.site.register(Attendee, AttendeeAdmin)
 admin.site.register(CourseAttendee, CourseAttendeeAdmin)
-admin.site.register(Price)

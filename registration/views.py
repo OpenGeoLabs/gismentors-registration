@@ -34,7 +34,7 @@ def submit(request, course_id):
 
     attendee = None
     course_attendee = None
-    course = get_object_or_404(CourseEvent, pk=course_id)
+    course_event = get_object_or_404(CourseEvent, pk=course_id)
 
     found_attendes = Attendee.objects.filter(email=request.POST["email_attendee"])
 
@@ -51,7 +51,7 @@ def submit(request, course_id):
         course_attendees = CourseAttendee.objects.filter(attendee=attendee)
         if course_attendees:
             course_attendee = course_attendees[0]
-            attendee.courses.add(course)
+            attendee.courses.add(course_event)
     else:
         if "marketing" in request.POST and request.POST["marketing"] == "on":
             marketing = True
@@ -75,34 +75,47 @@ def submit(request, course_id):
 
         course_attendee = CourseAttendee(
                 attendee=attendee,
-                course=course,
+                course=course_event,
                 student=student,
-                date_signed=datetime.date.today(),
+                registration_date=datetime.date.today(),
                 level=request.POST["level"],
                 note=request.POST["note"],
                 topics=request.POST["temata"],
                 next_topics=request.POST["temata_next"],
                 token=request.POST["csrfmiddlewaretoken"]
         )
-        course_attendee.save()
 
+    amount = 0
+    if course_attendee.registration_date <= course_event.early_date:
+        if course_attendee.student:
+            amount = course_event.price_student
+        else:
+            amount = course_event.price_regular
+    else:
+        amount = course_event.price_late
+
+    name  = request.POST["organisation"]
+    if not name:
+        name = attendee.name
     invoice_detail = InvoiceDetail(
         address="{street}\n{zipcode} - {city}".format(
             street=request.POST["street"], zipcode=request.POST["zip"],
             city=request.POST["city"]),
-        org=request.POST["organisation"],
+        name=name,
         ico=request.POST["ico"],
         dic=request.POST["dic"],
         objednavka=request.POST["order"],
+        amount=amount,
         email=request.POST["email"],
     )
 
     invoice_detail.save()
-    invoice_detail.course_attendees.add(course_attendee)
+    course_attendee.invoice_detail = invoice_detail
+    course_attendee.save()
 
     context = {
-            "course_name": course.course_type.title,
-            "course_date": course.date
+            "course_name": course_event.course_type.title,
+            "course_date": course_event.date
     }
 
     # TODO: send confirmation mail
