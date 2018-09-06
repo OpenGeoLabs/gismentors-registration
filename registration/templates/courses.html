@@ -18,7 +18,9 @@
     {% for course in latest_courses_list %}
         <tr>
             <td>
-                <a href="{{ course.course_type.detail }}" target="_blank">{{ course.course_type.title }}</a>
+                <a href="{{ course.course_type.detail }}" target="_blank">
+                    <img class="course_type" src="{{ course.course_type.image.url }}" />
+                    {{ course.course_type.title }}</a>
             </td>
             <td>
                 {% for key, value in level_choices %}

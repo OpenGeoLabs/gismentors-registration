@@ -9,7 +9,15 @@ Děkujeme Vám za přihlášení na kurz GISMentors <em>{{ course_name }}</em>, 
 se bude konat <em>{{ course_date }}</em> .
 </p>
 <p>
-Na e-mail účastníka XXX bude nejpozději následující pracovní den
+Na e-mail účastníka {{ attendee }} bude nejpozději následující pracovní den
 odesláno potvrzení přihlášky a další informace o kurzu.
 </p>
+<ul>
+    <li>
+        <a href="{% url 'course' course_id %}">Další přihlášení</a>
+    </li>
+    <li>
+        <a href="{% url 'courses' %}">Seznam školení</a>
+    </li>
+</ul>
 {% endblock %}

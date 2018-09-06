@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis.db import models as gismodels
 import uuid
+from django.conf import settings
 
 
 VAT=1.21
@@ -14,6 +15,9 @@ class CourseType(models.Model):
     title = models.CharField(
             max_length=50,
             verbose_name=_("Název"))
+
+    image = models.ImageField(
+            verbose_name=_("Logo"))
 
     level_choices = (
             (0, _("Začátečník")),

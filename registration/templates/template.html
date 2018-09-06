@@ -9,6 +9,21 @@
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}
 {% block extrahead %}{% endblock %}
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 
+
+<style>
+table img.course_type {
+    width: 30px;
+    height: 30px;
+}
+
+img.course_logo {
+    width: 200px;
+    height: 200px;
+    float:right;
+}
+</style>
+
 </head>
 {% load i18n %}
 

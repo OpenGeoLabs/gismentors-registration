@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.template import loader
 from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
+from django.views import defaults
+from  django.core.exceptions import SuspiciousOperation
 
 import datetime
 
@@ -11,6 +13,7 @@ from .models import CourseEvent
 from .models import Attendee
 from .models import CourseAttendee
 from .models import InvoiceDetail
+from .forms import RegistrationForm
 
 
 def courses(request):
@@ -21,17 +24,28 @@ def courses(request):
     }
     return render(request, "courses.html", context)
 
-def course(request, course_id):
+def _empty_form(request, course_id):
+
     course = get_object_or_404(CourseEvent, pk=course_id)
     level_options = CourseAttendee.level_choices
     context = {
             "course": course,
-            "level_options": level_options,
-            "level": course.course_type.level_choices[course.course_type.level][1]
+            "level": course.course_type.level_choices[course.course_type.level][1],
+            "form": RegistrationForm()
             }
-    return render(request, "course.html", context)
 
-def submit(request, course_id):
+    return render(request, "course-forms.html", context)
+
+
+def _register_new_attendee(request, course_id):
+
+    form = RegistrationForm(request.POST)
+
+    # Validate the form: the captcha field will automatically
+    # check the input
+    if not form.is_valid():
+        # return defaults.bad_request(request, SuspiciousOperation("Form not valid"))
+        pass
 
     attendee = None
     course_attendee = None
@@ -41,7 +55,8 @@ def submit(request, course_id):
     if "gdpr" in request.POST and request.POST["gdpr"] == "on":
         gdpr = True
     else:
-        raise Exception("GDPR musí být odsouhlaseno")
+        pass
+        # return defaults.bad_request(request, ValidationError("GDPR musí být potvrzeno"))
 
     try:
         attendee = Attendee.objects.get(email=request.POST["email_attendee"])
@@ -74,8 +89,8 @@ def submit(request, course_id):
             registration_date=datetime.date.today(),
             level=request.POST["level"],
             note=request.POST["note"],
-            topics=request.POST["temata"],
-            next_topics=request.POST["temata_next"],
+            topics=request.POST["topics"],
+            next_topics=request.POST["next_topics"],
             token=request.POST["csrfmiddlewaretoken"]
     )
 
@@ -97,9 +112,13 @@ def submit(request, course_id):
     name = request.POST["organisation"]
     if not name:
         name = attendee.name
+    invoicemail = request.POST["invoicemail"]
+    if not invoicemail:
+        invoicemail = request.POST["email_attendee"]
+
     invoice_detail = InvoiceDetail(
         address="{street}\n{zipcode} - {city}".format(
-            street=request.POST["street"], zipcode=request.POST["zip"],
+            street=request.POST["street"], zipcode=request.POST["zip_code"],
             city=request.POST["city"]),
         name=name,
         ico=request.POST["ico"],
@@ -107,7 +126,7 @@ def submit(request, course_id):
         objednavka=request.POST["order"],
         amount=amount,
         text=invoice_text,
-        email=request.POST["email"],
+        email=invoicemail
     )
 
     invoice_detail.save()
@@ -116,7 +135,9 @@ def submit(request, course_id):
 
     context = {
             "course_name": course_event.course_type.title,
-            "course_date": course_event.date
+            "course_date": course_event.date,
+            "attendee": attendee.name,
+            "course_id": course_event.id
     }
 
     # TODO: send confirmation mail
@@ -132,3 +153,10 @@ def submit(request, course_id):
     #)
 
     return render(request, "submitted.html", context)
+
+def course(request, course_id):
+
+    if request.POST:
+        return _register_new_attendee(request, course_id)
+    else:
+        return _empty_form(request, course_id)

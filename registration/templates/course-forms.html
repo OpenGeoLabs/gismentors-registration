@@ -1,0 +1,225 @@
+{% extends "template.html" %}
+
+{% block body %}
+{{ block.super }}
+
+<div class="card">
+  <div class="card-body">
+<img class="course_logo" src="{{ course.course_type.image.url }}" />
+<h1>Závazná přihláška na kurz {{ course.course_type.title }}
+</h1>
+<br>
+<h4>Úroveň</h4>
+{{ level }}
+<h4>Informace</h4>
+<a href="{{ course.course_type.detail }}" target="_blank">Detaily kurzu</a>
+<h4>Datum</h4>
+{{ course.date }}
+<h4>Místo konání</h4>
+{{ course.location.address.organisation }},
+  {{ course.location.address.street }}, {{ course.location.address.city }}
+  <a href="https://osm.org/go/0J0ajhhQa--?way=99013221" target="_blank">Mapa</a>
+
+
+<br>
+<div class="card border-light">
+    <div class="card-header">
+        <legend>Cena kurzu</legend>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <tbody>
+                <tr><td>{{ course.vat_late }},- Kč</td><td>plná cena</td></tr>
+                <tr><td>{{ course.vat_regular }},- Kč</td><td>při včasné registraci do {{ course.early_date }}</td></tr>
+                <tr><td>{{ course.vat_student }},- Kč</td><td>studenti při registarci do {{ course.early_date }} (maximálně 5 míst) </td></tr>
+            </tbody>
+        </table>
+        <small id="prices" class="form-text text-muted">Ceny jsou uvedeny včetně DPH. Ceny jsou smluvní, změna vyhrazena.
+        Hromadné slevy jsou možné po domluvě s organizátory.</small>
+    </div>
+</div>
+
+<form action="{% url 'course' course.id %}" method="post" class="needs-validation" validate>
+{% csrf_token %}
+
+{{ form.non_field_errors }}
+
+{% for hidden_field in form.hidden_fields %}
+    {{ hidden_field.errors }}
+    {{ hidden_field }}
+{% endfor %}
+
+
+    <div class="card border-light">
+    <fieldset>
+        <div class="card-header">
+            <legend>Kontaktní údaje</legend>
+        </div>
+        <div class="card-body">
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.name.errors }}
+                {{ form.name.label_tag }}
+                {{ form.name }}
+                <small class="form-text text-muted">{{ form.name.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.email_attendee.errors }}
+                {{ form.email_attendee.label_tag }}
+                {{ form.email_attendee }}
+                <small class="form-text text-muted">{{ form.email_attendee.help_text }}</small>
+            </div>
+
+        </div>
+    </fieldset>
+    </div>
+    <!-- //-->
+    <div class="card border-light">
+    <fieldset>
+        <div class="card-header">
+            <legend>Fakturační údaje</legend>
+        </div>
+        <div class="card-body">
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.organisation.errors }}
+                {{ form.organisation.label_tag }} <br />
+                {{ form.organisation }}
+                <small class="form-text text-muted">{{ form.organisation.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.street.errors }}
+                {{ form.street.label_tag }} <br />
+                {{ form.street }}
+                <small class="form-text text-muted">{{ form.street.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.city.errors }}
+                {{ form.city.label_tag }} <br />
+                {{ form.city }}
+                <small class="form-text text-muted">{{ form.city.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.zip_code.errors }}
+                {{ form.zip_code.label_tag }} <br />
+                {{ form.zip_code }}
+                <small class="form-text text-muted">{{ form.zip_code.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ forms.ico.errors }}
+                {{ form.ico.label_tag }} <br />
+                {{ form.ico }}
+                <small class="form-text text-muted">{{ form.ico.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.dic.errors }}
+                {{ form.dic.label_tag }} <br />
+                {{ form.dic }}
+                <small class="form-text text-muted">{{ form.dic.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.order.errors }}
+                {{ form.order.label_tag }}  <br />
+                {{ form.order }}
+                <small class="form-text text-muted">{{ form.order.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.invoicemail.errors }}
+                {{ form.invoicemail.label_tag }}<br />
+                {{ form.invoicemail }}
+                <small class="form-text text-muted">{{ form.invoicemail.help_text }}</small>
+            </div>
+
+        </div>
+    </fieldset>
+    </div>
+    <! -- //-->
+    <div class="card border-light">
+    <fieldset>
+        <div class="card-header">
+            <legend>Doplňující otázky</legend>
+        </div>
+        <div class="card-body">
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.student.errors }}
+                {{ form.student.label_tag }}
+                {{ form.student }}
+                <small class="form-text text-muted">{{ form.student.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.level.errors }}
+                {{ form.level.label_tag }}
+                {{ form.level }}
+                <small class="form-text text-muted">{{ form.level.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.topics.errors }}
+                {{ form.topics.label_tag }} <br />
+                {{ form.topics }}
+                <small class="form-text text-muted">{{ form.topics.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.next_topics.errors }}
+                {{ form.next_topics.label_tag }} <br />
+                {{ form.next_topics }}
+                <small class="form-text text-muted">{{ form.next_topics.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.note.errors }}
+                {{ form.note.label_tag }} <br />
+                {{ form.note }}
+                <small class="form-text text-muted">{{ form.note.help_text }}</small>
+            </div>
+
+        </div>
+    </fieldset>
+    </div>
+    <!-- //-->
+    <div class="card border-light">
+    <fieldset>
+        <div class="card-header">
+            <legend>GDPR a ochrana osobních údajů</legend>
+        </div>
+        <div class="card-body">
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.gdpr.errors }}
+                {{ form.gdpr.label_tag }}
+                {{ form.gdpr }}
+                <small class="form-text text-muted">{{ form.gdpr.help_text }}</small>
+            </div>
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.marketing.errors }}
+                {{ form.marketing.label_tag }}
+                {{ form.marketing }}
+                <small class="form-text text-muted">{{ form.marketing.help_text }}</small>
+            </div>
+
+        </div>
+    </fieldset>
+    </div>
+
+{{ form.captcha.errors }}
+{{ form.captcha.label_tag }}<br />
+{{ form.captcha }}
+<button class='btn btn-primary mb-3 js-captcha-refresh'>Načíst jiný obrázek</button>
+<small class="form-text text-muted">{{ form.captcha.help_text }}</small>
+
+
+<button class="btn btn-primary mb-2" type="submit">Odeslat závaznou přihlášku</button>
+
+<script type="text/javascript">
+$('.js-captcha-refresh').click(function () {
+    $.getJSON("/captcha/refresh/", function (result) {
+        $('.captcha').attr('src', result['image_url']);
+        $('#id_captcha_0').val(result['key'])
+    });
+
+
+    return false;
+});
+</script>
+</form>
+
+
+{% endblock %}
+  </div>
+</div>
+
