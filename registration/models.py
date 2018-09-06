@@ -42,7 +42,9 @@ class CourseType(models.Model):
 
     def __str__(self):
 
-        return "{} ({})".format(self.title, dict(self.level_choices)[self.level])
+        level = dict(self.level_choices)[self.level][0:3]
+        return "{} - {}.".format(self.title, level)
+
 
 class Address(models.Model):
 
@@ -153,7 +155,8 @@ class CourseEvent(models.Model):
         return int(VAT*self.price_student)
 
     def __str__(self):
-        return self.course_type.__str__()
+        return "{} ({})".format(
+            self.course_type.__str__(), self.date)
 
 
 class InvoiceDetail(models.Model):
@@ -197,6 +200,9 @@ class InvoiceDetail(models.Model):
     invoice = models.FileField(
             blank=True,
             verbose_name=_("Faktura"))
+
+    text = models.TextField(
+            verbose_name=_("Obsah"))
 
     def __str__(self):
         if self.name == None:

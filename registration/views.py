@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.template import loader
 from django.core.mail import send_mail
+from django.core.exceptions import ObjectDoesNotExist
 
 import datetime
 
@@ -36,23 +37,18 @@ def submit(request, course_id):
     course_attendee = None
     course_event = get_object_or_404(CourseEvent, pk=course_id)
 
-    found_attendes = Attendee.objects.filter(email=request.POST["email_attendee"])
 
     if "gdpr" in request.POST and request.POST["gdpr"] == "on":
         gdpr = True
     else:
         raise Exception("GDPR musí být odsouhlaseno")
 
-    if found_attendes:
-        found_attendes[0].name = request.POST["name"]
-        found_attendes[0].date_signed = datetime.date.today()
-        found_attendes[0].save()
-        attendee = found_attendes[0]
-        course_attendees = CourseAttendee.objects.filter(attendee=attendee)
-        if course_attendees:
-            course_attendee = course_attendees[0]
-            attendee.courses.add(course_event)
-    else:
+    try:
+        attendee = Attendee.objects.get(email=request.POST["email_attendee"])
+        attendee.name = request.POST["name"]
+        attendee.date_signed = datetime.date.today()
+        attendee.save()
+    except ObjectDoesNotExist as e:
         if "marketing" in request.POST and request.POST["marketing"] == "on":
             marketing = True
         else:
@@ -66,24 +62,22 @@ def submit(request, course_id):
         new_attendee.save()
         attendee = new_attendee
 
-    if not course_attendee:
+    if "student" in request.POST and request.POST["student"] == "on":
+        student = True
+    else:
+        student = False
 
-        if "student" in request.POST and request.POST["student"] == "on":
-            student = True
-        else:
-            student = False
-
-        course_attendee = CourseAttendee(
-                attendee=attendee,
-                course=course_event,
-                student=student,
-                registration_date=datetime.date.today(),
-                level=request.POST["level"],
-                note=request.POST["note"],
-                topics=request.POST["temata"],
-                next_topics=request.POST["temata_next"],
-                token=request.POST["csrfmiddlewaretoken"]
-        )
+    course_attendee = CourseAttendee(
+            attendee=attendee,
+            course=course_event,
+            student=student,
+            registration_date=datetime.date.today(),
+            level=request.POST["level"],
+            note=request.POST["note"],
+            topics=request.POST["temata"],
+            next_topics=request.POST["temata_next"],
+            token=request.POST["csrfmiddlewaretoken"]
+    )
 
     amount = 0
     if course_attendee.registration_date <= course_event.early_date:
@@ -94,7 +88,13 @@ def submit(request, course_id):
     else:
         amount = course_event.price_late
 
-    name  = request.POST["organisation"]
+    level = list(filter(lambda c: c[0] == course_event.course_type.level,
+                 CourseType.level_choices))[0][1]
+
+    invoice_text = "{} - {}".format(course_event.course_type.title,
+                                    level)
+
+    name = request.POST["organisation"]
     if not name:
         name = attendee.name
     invoice_detail = InvoiceDetail(
@@ -106,6 +106,7 @@ def submit(request, course_id):
         dic=request.POST["dic"],
         objednavka=request.POST["order"],
         amount=amount,
+        text=invoice_text,
         email=request.POST["email"],
     )
 
