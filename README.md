@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'leaflet',
     'registration.apps.RegistrationConfig',
     'django.contrib.gis',
+    'captcha'
 
 ]
 
@@ -61,12 +62,17 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static")
 ]
 
+...
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASEDIR, "media")
+
 ```
 
 
 Do further settings modifications.
 
-## Init databse
+## Init database
 
 ```
 python manage.py makemigrations registration
@@ -79,11 +85,14 @@ to `gismentors/urls.py` add `registration.urls`:
 
 ```
 from django.conf.urls import url
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     ...
     url(r'^courses/', include('registration.urls')),
-]
+    url(r'^captcha/', include('captcha.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 
 ## Testing
