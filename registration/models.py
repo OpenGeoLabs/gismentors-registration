@@ -158,6 +158,14 @@ class CourseEvent(models.Model):
     def vat_student(self):
         return int(VAT*self.price_student)
 
+    @property
+    def json(self):
+        return {
+            "name": self.course_type.title,
+            "date": self.date,
+            "level": self.course_type.level
+        }
+
     def __str__(self):
         return "{} ({})".format(
             self.course_type.__str__(), self.date)
@@ -319,7 +327,8 @@ class CourseAttendee(models.Model):
             blank=True,
             verbose_name=_("Certifikát"))
 
-    token = models.TextField(
+    token = models.CharField(
+        max_length=36,
         default=uuid.uuid4(),
         verbose_name=_("Token"))
 

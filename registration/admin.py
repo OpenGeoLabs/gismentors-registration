@@ -82,11 +82,6 @@ class CourseEventInline(admin.TabularInline):
 class AttendeeAdmin(admin.ModelAdmin):
     list_display = ("name", "email", "date_signed")
 
-    #def formfield_for_manytomany(self, db_field, request, **kwargs):
-    #    if db_field.name == "courses":
-    #        kwargs["queryset"] = /ourseAttendee.objects.filter(owner=request.user)
-    #    return super().formfield_for_manytomany(db_field, request, **kwargs)
-
 
 class CourseAdmin(admin.ModelAdmin):
     list_display = ("course_type", "date", "attendees")

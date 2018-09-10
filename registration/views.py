@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
@@ -14,9 +15,23 @@ from .models import CourseAttendee
 from .models import InvoiceDetail
 from .forms import RegistrationForm
 
+def courses_json(request):
+    latest_courses_list = CourseEvent.objects.order_by('date')
+    print([course.json for course in latest_courses_list])
+    return JsonResponse({
+        "courses": [course.json for course in latest_courses_list if
+                    course.date > datetime.date.today()]})
+
+def courses_atom(request):
+    latest_courses_list = CourseEvent.objects.order_by('date')
+    print([course.json for course in latest_courses_list])
+    return JsonResponse({
+        "courses": [course.json for course in latest_courses_list if
+                    course.date > datetime.date.today()]})
+
 
 def courses(request):
-    latest_courses_list = CourseEvent.objects.order_by('date')[:5]
+    latest_courses_list = CourseEvent.objects.order_by('date')
     context = {
         'latest_courses_list': latest_courses_list,
         "level_choices": CourseType.level_choices
