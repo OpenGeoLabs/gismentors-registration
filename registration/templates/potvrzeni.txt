@@ -4,7 +4,7 @@ Tímto potvrzujeme, že jsme zaregistrovali Vaši přihlášku na kurz GISmentor
 
 Jméno: {{ name }}
 Kurz: {{ title }}
-Datum: {{ date }}
+Datum: {{ date|date:'d.m.Y' }}
 Student: {{ student }}
 
 Detailní instrukce Vám pošleme několik dní před zahájením kurzu.
