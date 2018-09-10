@@ -36,10 +36,10 @@ class AddressInline(admin.StackedInline):
     model = Address
 
 
-class CourseAttendeeInline(admin.StackedInline):
+class CourseAttendeeInline(admin.TabularInline):
     model = CourseAttendee
-    fields = ("attendee", )
-    readonly_fields = ("attendee", )
+    fields = ("attendee", "registration_date")
+    readonly_fields = ("attendee", "registration_date", )
     extra = 0
 
 

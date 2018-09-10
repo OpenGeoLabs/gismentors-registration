@@ -336,5 +336,6 @@ class CourseAttendee(models.Model):
         "InvoiceDetail",
         on_delete=models.PROTECT)
 
+
     def __str__(self):
         return self.attendee.name
