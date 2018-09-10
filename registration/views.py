@@ -1,10 +1,9 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
-from django.template import loader
 from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
-from django.views import defaults
-from  django.core.exceptions import SuspiciousOperation
+from django.conf import settings
+from django.template.loader import render_to_string
 
 import datetime
 
@@ -24,15 +23,15 @@ def courses(request):
     }
     return render(request, "courses.html", context)
 
+
 def _empty_form(request, course_id):
 
     course = get_object_or_404(CourseEvent, pk=course_id)
-    level_options = CourseAttendee.level_choices
     context = {
-            "course": course,
-            "level": course.course_type.level_choices[course.course_type.level][1],
-            "form": RegistrationForm()
-            }
+        "course": course,
+        "level": course.course_type.level_choices[course.course_type.level][1],
+        "form": RegistrationForm()
+    }
 
     return render(request, "course-forms.html", context)
 
@@ -58,16 +57,19 @@ def _register_new_attendee(request, course_id):
         pass
         # return defaults.bad_request(request, ValidationError("GDPR musí být potvrzeno"))
 
+    if "marketing" in request.POST and request.POST["marketing"] == "on":
+        marketing = True
+    else:
+        marketing = False
+
     try:
         attendee = Attendee.objects.get(email=request.POST["email_attendee"])
         attendee.name = request.POST["name"]
         attendee.date_signed = datetime.date.today()
+        attendee.marketing = marketing
+        attendee.gdpr = gdpr
         attendee.save()
     except ObjectDoesNotExist as e:
-        if "marketing" in request.POST and request.POST["marketing"] == "on":
-            marketing = True
-        else:
-            marketing = False
         new_attendee = Attendee.objects.create(
                 name=request.POST["name"],
                 email=request.POST["email_attendee"],
@@ -82,6 +84,18 @@ def _register_new_attendee(request, course_id):
     else:
         student = False
 
+    try:
+        existing_attendee = course_event.courseattendee_set.get(
+            attendee__name=attendee.name,
+            attendee__email=attendee.email)
+        context = {
+            "name": existing_attendee.attendee.name,
+            "title": course_event.course_type.title
+        }
+        return render(request, "already_registered.html", context)
+    except ObjectDoesNotExist as e:
+            pass
+
     course_attendee = CourseAttendee(
             attendee=attendee,
             course=course_event,
@@ -93,6 +107,9 @@ def _register_new_attendee(request, course_id):
             next_topics=request.POST["next_topics"],
             token=request.POST["csrfmiddlewaretoken"]
     )
+
+    attendee.courses.add(course_event)
+    attendee.save()
 
     amount = 0
     if course_attendee.registration_date <= course_event.early_date:
@@ -140,19 +157,39 @@ def _register_new_attendee(request, course_id):
             "course_id": course_event.id
     }
 
-    # TODO: send confirmation mail
-    # TODO: send mail to courses@gismentors.cz with information about new
-    # registration
+    send_mail(
+        '[GISmentors-kurzy] {} - {}'.format(
+            course_event.course_type.title, course_event.date
+        ),
+        """
+        Kurz: {}
+        Účastník: {}
+        Organizace: {}
+        Celkem registrovaných účastníků: {}""".format(
+            course_event.course_type.title,
+            attendee.name,
+            invoice_detail.name,
+            len(course_event.courseattendee_set.all())
+        ),
+        'info@gismentors.cz',
+        [settings.INFO_MAIL],
+        fail_silently=True,
+    )
 
-    #send_mail(
-    #    'Od Djanga',
-    #    'Účastník přihlášen',
-    #    'jachym@chvostokok',
-    #    ['jachym@chvostoskok'],
-    #    fail_silently=False,
-    #)
+    send_mail(
+        '[GISmentors-kurzy] Potvrzení přihlášení',
+        render_to_string('potvrzeni.txt', {
+            'name': attendee.name,
+            "title": course_event.course_type.title,
+            "date": course_event.date,
+            "student": student}),
+        'info@gismentors.cz',
+        [attendee.email],
+        fail_silently=True,
+    )
 
     return render(request, "submitted.html", context)
+
 
 def course(request, course_id):
 
