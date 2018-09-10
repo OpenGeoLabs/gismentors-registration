@@ -1,0 +1,19 @@
+Potvrzení přihlášení na kurz GISmentors.
+
+Tímto potvrzujeme, že jsme zaregistrovali Vaši přihlášku na kurz GISmentors
+
+Jméno: {{ name }}
+Kurz: {{ title }}
+Datum: {{ date }}
+Student: {{ student }}
+
+Detailní instrukce Vám pošleme několik dní před zahájením kurzu.
+
+V případě jakéhokoliv dotazu nám napište na adresu
+
+    info [zavináč] gismentors [tečka] cz
+
+Děkujeme za Vaši přízeň
+
+GISMentors
+

@@ -1,0 +1,21 @@
+{% extends "template.html" %}
+
+{% block body %}
+{{ block.super }}
+
+<h1 class="alert alert-danger">Přihláška nemohla být přijata</h1>
+<p>
+Děkujeme Vám za zájem o kurz GISMentors <em>{{ title }}</em>.
+</p>
+<p class="alert alert-danger">
+Uživatel s Vaším jménem [{{ name }}] a stejným e-mailem již na tomto kurzu
+registrován je.
+</p>
+<p>
+Pokud si přejete přesto registrovat, napište nám prosím e-mail na adresu
+<abbr title="uveďte e-mail ve správném formátu">info&nbsp;zavináč&nbsp;gismentors&nbsp;tečka&nbsp;cz</abbr>.
+</p>
+<p>
+Děkujeme - GISMentors
+</p>
+{% endblock %}
