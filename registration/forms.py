@@ -2,6 +2,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from .models import CourseType
+from .models import CourseAttendee
 from captcha.fields import CaptchaField
 
 
@@ -43,7 +44,7 @@ class RegistrationForm(forms.Form):
 
     level = forms.ChoiceField(
         label=_('V oblasti GIS se považuji za'),
-        choices=CourseType.level_choices
+        choices=CourseAttendee.level_choices
     )
 
     topics = forms.CharField(
