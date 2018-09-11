@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ <title>GISMentors kurzy</title>
+ <subtitle>Termíny vypsaných kurzů open source GIS</subtitle>
+ <link href="http://kurzy.gismentors.cz/atom/" rel="self"/>
+ <link href="http://gismentors.cz"/>
+ <updated>{{ date }}</updated>
+ <author>
+   <name>GISMentors</name>
+   <email>info gismentors cz</email>
+ </author>
+ <id>{{ uuid }}</id>
+ {% for course in courses %}
+ <entry>
+   <title>{{ course.course_type.title }}</title>
+   <link href="{{ course.course_type.detail }}"/>
+   <updated>{{ course.date }}</updated>
+   <summary>{{ course.course_type.description }} {{ course.note }}</summary>
+ </entry>
+ {% endfor %}
+</feed>

@@ -7,6 +7,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 import datetime
+import uuid
 
 from .models import CourseType
 from .models import CourseEvent
@@ -15,19 +16,23 @@ from .models import CourseAttendee
 from .models import InvoiceDetail
 from .forms import RegistrationForm
 
+
 def courses_json(request):
     latest_courses_list = CourseEvent.objects.order_by('date')
-    print([course.json for course in latest_courses_list])
     return JsonResponse({
         "courses": [course.json for course in latest_courses_list if
                     course.date > datetime.date.today()]})
 
+
 def courses_atom(request):
     latest_courses_list = CourseEvent.objects.order_by('date')
-    print([course.json for course in latest_courses_list])
-    return JsonResponse({
-        "courses": [course.json for course in latest_courses_list if
-                    course.date > datetime.date.today()]})
+    courses = latest_courses_list
+    context = {
+        "courses": courses,
+        "date": courses[0].date,
+        "uuid": uuid.uuid1(),
+    }
+    return render(request, "atom.xml", context)
 
 
 def courses(request):
