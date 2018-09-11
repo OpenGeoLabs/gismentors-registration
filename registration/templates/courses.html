@@ -30,7 +30,7 @@
                 {% endfor %}
             </td>
             <td>
-                {{ course.date }}
+                {{ course.date|date:'d.m.Y' }}
             </td>
             <td>
                 {{ course.location.address.organisation }},
