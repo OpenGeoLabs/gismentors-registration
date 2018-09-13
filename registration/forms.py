@@ -8,7 +8,7 @@ from captcha.fields import CaptchaField
 
 class RegistrationForm(forms.Form):
 
-    captcha = CaptchaField(help_text="Opiště text na obrázku")
+    captcha = CaptchaField(help_text="Opište text na obrázku")
 
     name = forms.CharField(
         label=_('Jméno a příjmení'), max_length=100)
@@ -84,11 +84,11 @@ class RegistrationForm(forms.Form):
         čtyřikrát za rok), obsahující informace o aktuálním dění ve
         společnosti. Jsem si vědom/a toho, že souhlas použití mého e-mailu pro
         marketingové účely mohu kdykoliv odvolat zasláním e-mailu na adresu
-        <abbr title="nahradtě správnou formou e-mailu">info [zavináč] opengeolabs [tečka] cz</abbr>. Souhlas bude
+        <abbr title="nahraďte správnoh formou e-mailu">info [zavináč] opengeolabs [tečka] cz</abbr>. Souhlas bude
         automaticky prodloužen vždy o další roční období, pokud nedojde k jeho
         odvolání písemnou formou. Jsem si vědom/a svých práv, které subjektům
         poskytuje zákon 101/2000 Sb., o ochraně osobních údajů. Na základě
         tohoto souhlasu budeme zpracovávat vaše kontaktní údaje, údaje o
-        obsolvovaných kurzech u nás.'''))
+        absolvovaných kurzech u nás.'''))
 
     contact_fieldset = (name, email_attendee)

@@ -246,7 +246,7 @@ class Attendee(models.Model):
             a zařazením do databáze uživatelů společnosti OpenGeoLabs s.r.o.
             se sídlem v Brandlova 1559/7, Praha 11, 149 00 (dále jen
             OpenGeoLabs s.r.o.) pro vlastní použití v souladu s příslušnými
-            ustanoveními zákona c. 101 / 2000 Sb. O ochraně osobních údajů a o
+            ustanoveními zákona č. 101 / 2000 Sb. O ochraně osobních údajů a o
             změně některých údajů v platném znění. Beru na vědomí, že údaje
             budou využívány pouze v rámci společnosti OpenGeoLabs s.r.o.. Jsem
             si vědom/a toho, že souhlas s jejich zpracováním mohu kdykoliv
@@ -270,7 +270,7 @@ class Attendee(models.Model):
             k jeho odvolání písemnou formou. Jsem si vědom/a svých práv, které
             subjektům poskytuje zákon 101/2000 Sb., o ochraně osobních údajů. Na
             základě tohoto souhlasu budeme zpracovávat vaše kontaktní údaje,
-            údaje o obsolvovaných kurzech u nás.
+            údaje o absolvovaných kurzech u nás.
             """))
 
     date_signed = models.DateField(
