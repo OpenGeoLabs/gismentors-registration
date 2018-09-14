@@ -1,24 +1,38 @@
 {% extends "template.html" %}
+{% block navigation %}
+<nav aria-label="breadcrumb">
+<ol class="breadcrumb">
+    <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'courses' %}">Seznam kurzů</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ course.course_type }}</li>
+</ol>
+</nav>
+{% endblock %}
 
 {% block body %}
 {{ block.super }}
 
 <div class="card">
   <div class="card-body">
+          <h1>{{ course.course_type.title }} - {{ level }} </h1>
 <img class="course_logo" src="{{ course.course_type.image.url }}" />
-<h1>Závazná přihláška na kurz {{ course.course_type.title }}
-</h1>
 <br>
-<h4>Úroveň</h4>
-{{ level }}
-<h4>Informace</h4>
+<div>
+Závazná přihláša na jednodenní kurz {{ course.course_type.title }} - {{ level }}
+pořádaný <a href="http://gismentors.cz">GISMentors</a>.
+</div>
+<div class="detail-link">
 <a href="{{ course.course_type.detail }}" target="_blank">Detaily kurzu</a>
-<h4>Datum</h4>
-{{ course.date|date:'d.m.Y' }}
-<h4>Místo konání</h4>
-{{ course.location.address.organisation }},
+</div>
+<div>Datum: {{ course.date }}</div>
+<div>Místo konání: {{ course.location.address.organisation }},
   {{ course.location.address.street }}, {{ course.location.address.city }}
-  <a href="https://osm.org/go/0J0ajhhQa--?way=99013221" target="_blank">Mapa</a>
+  <a href="https://osm.org/go/0J0ajhhQa--?way=99013221" target="_blank">(mapa)</a>
+</div>
+{% if course.note %}
+<div>
+Poznámka: {{ course.note }}
+</div>
+{% endif %}
 
 
 <br>
@@ -30,8 +44,8 @@
         <table class="table">
             <tbody>
                 <tr><td>{{ course.vat_late }},- Kč</td><td>plná cena</td></tr>
-                <tr><td>{{ course.vat_regular }},- Kč</td><td>při včasné registraci do {{ course.early_date|date:'d.m.Y' }}</td></tr>
-                <tr><td>{{ course.vat_student }},- Kč</td><td>studenti při registraci do {{ course.early_date|date:'d.m.Y' }} (maximálně 5 míst) </td></tr>
+                <tr><td>{{ course.vat_regular }},- Kč</td><td>při včasné registraci do {{ course.early_date }}</td></tr>
+                <tr><td>{{ course.vat_student }},- Kč</td><td>studenti při registraci do {{ course.early_date }} (maximálně 5 míst) </td></tr>
             </tbody>
         </table>
         <small id="prices" class="form-text text-muted">Ceny jsou uvedeny včetně DPH. Ceny jsou smluvní, změna vyhrazena.
@@ -58,17 +72,22 @@
         <div class="card-body">
             <div class="form-group mb-2 mr-sm-2">
                 {{ form.name.errors }}
-                {{ form.name.label_tag }}
+                {{ form.name.label_tag }}<br />
                 {{ form.name }}
                 <small class="form-text text-muted">{{ form.name.help_text }}</small>
             </div>
             <div class="form-group mb-2 mr-sm-2">
                 {{ form.email_attendee.errors }}
-                {{ form.email_attendee.label_tag }}
+                {{ form.email_attendee.label_tag }}<br />
                 {{ form.email_attendee }}
                 <small class="form-text text-muted">{{ form.email_attendee.help_text }}</small>
             </div>
-
+            <div class="form-group mb-2 mr-sm-2">
+                {{ form.student.errors }}
+                {{ form.student.label_tag }}
+                {{ form.student }}
+                <small class="form-text text-muted">{{ form.student.help_text }}</small>
+            </div>
         </div>
     </fieldset>
     </div>
@@ -139,14 +158,8 @@
         </div>
         <div class="card-body">
             <div class="form-group mb-2 mr-sm-2">
-                {{ form.student.errors }}
-                {{ form.student.label_tag }}
-                {{ form.student }}
-                <small class="form-text text-muted">{{ form.student.help_text }}</small>
-            </div>
-            <div class="form-group mb-2 mr-sm-2">
                 {{ form.level.errors }}
-                {{ form.level.label_tag }}
+                {{ form.level.label_tag }}<br />
                 {{ form.level }}
                 <small class="form-text text-muted">{{ form.level.help_text }}</small>
             </div>
@@ -215,6 +228,7 @@ $('.js-captcha-refresh').click(function () {
 
     return false;
 });
+
 </script>
 </form>
 

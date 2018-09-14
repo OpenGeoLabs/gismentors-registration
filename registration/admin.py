@@ -52,7 +52,7 @@ class LocationAdmin(LeafletGeoAdmin):
 
 class CourseEventAdmin(admin.ModelAdmin):
     inlines = [CourseAttendeeInline]
-    list_display = ("course_name", "level", "date", "attendees", "days_left")
+    list_display = ("course_name", "level", "status", "date", "attendees", "days_left")
 
     list_filter = (DateFilter, )
 

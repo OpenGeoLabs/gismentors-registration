@@ -11,7 +11,8 @@ class RegistrationForm(forms.Form):
     captcha = CaptchaField(help_text="Opište text na obrázku")
 
     name = forms.CharField(
-        label=_('Jméno a příjmení'), max_length=100)
+        label=_('Jméno a příjmení'), max_length=255,
+        help_text="""Jméno a příjmení včetně titulů""")
 
     email_attendee = forms.EmailField(
         label=_('E-mail účastníka'),
@@ -19,19 +20,21 @@ class RegistrationForm(forms.Form):
                      budeme řešit organizační záležitosti kurzu.''')
 
     organisation = forms.CharField(
-        required=False, label=_('Organizace'))
+        required=False, max_length=50, label=_('Organizace'))
 
-    street = forms.CharField(label=_('Ulice a číslo popisné'))
+    street = forms.CharField(label=_('Ulice a číslo popisné'),
+                            max_length=50)
 
-    city = forms.CharField(label=_('Město'))
+    city = forms.CharField(label=_('Město'), max_length=50)
 
-    zip_code = forms.CharField(label=_('PSČ'))
+    zip_code = forms.CharField(label=_('PSČ'), max_length=10)
 
-    ico = forms.CharField(label=_('IČ'), required=False)
+    ico = forms.CharField(label=_('IČ'), required=False, max_length=12)
 
-    dic = forms.CharField(label=_('DIČ'), required=False)
+    dic = forms.CharField(label=_('DIČ'), required=False, max_length=16)
 
-    order = forms.CharField(label=_('Číslo objednávky'), required=False)
+    order = forms.CharField(label=_('Číslo objednávky'), required=False,
+                            max_length=16)
 
     invoicemail = forms.EmailField(
         label=_('Fakturační e-mail'), required=False,

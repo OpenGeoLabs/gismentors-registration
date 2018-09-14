@@ -1,5 +1,12 @@
-
 {% extends "template.html" %}
+{% block navigation %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'courses' %}">Seznam kurzů</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'course' course.id %}">{{ course.course_type.title }} - {{ course.course_type.level }}</li>
+  </ol>
+</nav>
+{% endblock %}
 {% block body %}
 {{ block.super }}
 <h2>Nadcházející kurzy</h2>
@@ -8,39 +15,48 @@
     <thead class="thead-light">
      <tr>
           <th>Kurz</th>
-          <th>Úroveň</th>
           <th>Datum</th>
-          <th>Místo</th>
           <th>Včasná registrace</th>
+          <th>Místo</th>
           <th>Závazná přihláška</th>
          </tr>
     <tbody>
     {% for course in latest_courses_list %}
-        <tr>
+        <tr class="{{ course.status }}">
             <td>
                 <a href="{{ course.course_type.detail }}" target="_blank">
                     <img class="course_type" src="{{ course.course_type.image.url }}" />
-                    {{ course.course_type.title }}</a>
-            </td>
-            <td>
+                    {{ course.course_type.title }}
+                -
                 {% for key, value in level_choices %}
                     {% if key == course.course_type.level %}
                         {{ value }}
                     {% endif %}
                 {% endfor %}
+                </a>
             </td>
             <td>
-                {{ course.date|date:'d.m.Y' }}
+                <strong>{{ course.date }}</strong>
+            </td>
+            <td>
+                {{ course.early_date }}
             </td>
             <td>
                 {{ course.location.address.organisation }},
                 {{ course.location.address.city }}
             </td>
             <td>
-                {{ course.early_date }}
-            </td>
-            <td>
-                    <a href="{% url 'course' course.id %}" target="_blank">Závazná přihláška</a>
+                {% if course.status == 'published' %}
+                    <a class="btn btn-outline-primary" role="button" href="{% url 'course' course.id %}">Přihlásit se</a>
+                {% else %}
+                    {% if course.status == 'declined' %}
+                    Termín zrušen
+                    {% endif %}
+                    {% if course.status == 'closed' %}
+                    <abbr title="v případě potřeby se na nás obraťte
+                        e-mailem">Kapacita kurzu byla naplněna</abbr>
+                    {% endif %}
+                {% endif %}
             </td>
         </tr>
     {% endfor %}

@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis.db import models as gismodels
 import uuid
 from django.conf import settings
+from django.utils.safestring import mark_safe
 
 
 VAT=1.21
@@ -62,7 +63,7 @@ class Address(models.Model):
             max_length=50)
 
     postal_code = models.CharField(
-            max_length=50)
+            max_length=10)
 
     location = models.OneToOneField("Location",
             on_delete=models.CASCADE
@@ -108,8 +109,22 @@ class CourseEvent(models.Model):
         (DECLINED, "Zrušený"),
     )
 
-    status = models.CharField(max_length=10, choices=status_choices,
-                              default=CREATED)
+    status = models.CharField(
+        max_length=10, choices=status_choices, default=CREATED,
+        help_text=_("""<dl>
+                    <dt>Vytvořený</dt>
+                    <dd>Kurz je vytvořený, ale v nabídce se ještě neukazuje</dd>
+                    <dt>Publikovaný</dt>
+                    <dd>Kurz se ukazuje v naší veřejné nabídce kurzů</dd>
+                    <dt>Uzavřený</dt>
+                    <dd>Kurz se ukazuje v naší veřejné nabídce kurzů, ale jako
+                    uzavřený pro přihlášky.</dd>
+                    <dt>Zrušený</dt>
+                    <dd>Kurz se ukazuje v naší nabídce kurzů, ale označený jako
+                    zrušený.</dd>
+                    </dl>
+                                """)
+    )
 
     date = models.DateField(
             verbose_name=_("Datum")
@@ -132,17 +147,27 @@ class CourseEvent(models.Model):
 
     price_regular = models.IntegerField(
             verbose_name="Včasná registrace",
-            help_text="Kč, bez DPH"
+            help_text=_("""Kč, bez DPH <br/>
+        <dl>
+        <dt>Začátečník</dt><dd> 4000</dd>
+        <dt>Pokročilý</dt><dd> 6000</dd>
+        </dl>""")
     )
 
     price_late = models.IntegerField(
             verbose_name="Standardní",
-            help_text="Kč, bez DPH"
+            help_text=_("""Kč, bez DPH<br />
+        <dl>
+        <dt>Začátečník</dt><dd>6000</dd>
+        <dt>Pokročilý</dt><dd>7000</dd>
+        </dl>
+        """)
     )
 
     price_student = models.IntegerField(
             verbose_name="Studentská",
-            help_text="Kč, bez DPH"
+            help_text=_("""Kč, bez DPH"""),
+            default=1000
     )
 
     @property
@@ -229,8 +254,9 @@ class Attendee(models.Model):
         verbose_name_plural = _("Učastníci")
 
     name = models.CharField(
-            max_length=50,
-           verbose_name=_("Jméno"))
+        max_length=50,
+        verbose_name=_("Jméno")
+    )
 
     email = models.EmailField(
             primary_key=True,
@@ -262,15 +288,17 @@ class Attendee(models.Model):
             verbose_name=_("Souhlas s posíláním marketingových materiálů"),
             help_text=_("""Souhlasím s tím, že společnost OpenGeoLabs s.r.o.
             může využít můj e-mail pro zaslání krátké marketingové zprávy (ne
-            častěji, než čtyřikrát za rok), obsahující informace o aktuálním
-            dění ve společnosti. Jsem si vědom/a toho, že souhlas použití mého
-            e-mailu pro marketingové účely mohu kdykoliv odvolat zasláním
-            e-mailu na adresu info [zavináč] opengeolabs [tečka] cz. Souhlas
-            bude automaticky prodloužen vždy o další roční období, pokud nedojde
-            k jeho odvolání písemnou formou. Jsem si vědom/a svých práv, které
-            subjektům poskytuje zákon 101/2000 Sb., o ochraně osobních údajů. Na
-            základě tohoto souhlasu budeme zpracovávat vaše kontaktní údaje,
-            údaje o absolvovaných kurzech u nás.
+            častěji, než čtyřikrát za rok), obsahující informace o slevách a
+            mimořádných nabídkách a informace o aktuálním dění ve společnosti.
+            Jsem si vědom/a toho, že souhlas použití mého e-mailu
+            pro marketingové účely mohu kdykoliv odvolat zasláním
+            e-mailu na adresu info [zavináč] opengeolabs [tečka]
+            cz. Souhlas bude automaticky prodloužen vždy o další
+            roční období, pokud nedojde k jeho odvolání písemnou
+            formou. Jsem si vědom/a svých práv, které subjektům
+            poskytuje zákon 101/2000 Sb., o ochraně osobních údajů.
+            Na základě tohoto souhlasu budeme zpracovávat vaše
+            kontaktní údaje, údaje o absolvovaných kurzech u nás.
             """))
 
     date_signed = models.DateField(
@@ -328,7 +356,7 @@ class CourseAttendee(models.Model):
             verbose_name=_("Certifikát"))
 
     token = models.CharField(
-        max_length=36,
+        max_length=255,
         default=uuid.uuid4(),
         verbose_name=_("Token"))
 

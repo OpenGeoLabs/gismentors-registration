@@ -36,7 +36,7 @@ def courses_atom(request):
 
 
 def courses(request):
-    latest_courses_list = CourseEvent.objects.order_by('date')
+    latest_courses_list = CourseEvent.objects.exclude(status=CourseEvent.CREATED).filter(date__gte=datetime.date.today()).order_by('date')
     context = {
         'latest_courses_list': latest_courses_list,
         "level_choices": CourseType.level_choices
@@ -69,6 +69,10 @@ def _register_new_attendee(request, course_id):
     attendee = None
     course_attendee = None
     course_event = get_object_or_404(CourseEvent, pk=course_id)
+
+    level = list(filter(lambda c: c[0] == course_event.course_type.level,
+                 CourseType.level_choices))[0][1]
+
 
 
     if "gdpr" in request.POST and request.POST["gdpr"] == "on":
@@ -104,17 +108,16 @@ def _register_new_attendee(request, course_id):
     else:
         student = False
 
-    try:
-        existing_attendee = course_event.courseattendee_set.get(
-            attendee__name=attendee.name,
-            attendee__email=attendee.email)
+    existing_attendees = course_event.courseattendee_set.filter(
+        attendee__name=attendee.name,
+        attendee__email=attendee.email)
+
+    if len(existing_attendees) > 0:
         context = {
-            "name": existing_attendee.attendee.name,
-            "title": course_event.course_type.title
+            "name": existing_attendees[0].attendee.name,
+            "title": "{} - {}".format(course_event.course_type.title, level)
         }
         return render(request, "already_registered.html", context)
-    except ObjectDoesNotExist as e:
-            pass
 
     course_attendee = CourseAttendee(
             attendee=attendee,
@@ -139,9 +142,6 @@ def _register_new_attendee(request, course_id):
             amount = course_event.price_regular
     else:
         amount = course_event.price_late
-
-    level = list(filter(lambda c: c[0] == course_event.course_type.level,
-                 CourseType.level_choices))[0][1]
 
     invoice_text = "{} - {}".format(course_event.course_type.title,
                                     level)
@@ -171,9 +171,11 @@ def _register_new_attendee(request, course_id):
     course_attendee.save()
 
     context = {
-            "course_name": course_event.course_type.title,
+            "course_name": "{} - {}".format(course_event.course_type.title,
+                                            level),
             "course_date": course_event.date,
             "attendee": attendee.name,
+            "mail": attendee.email,
             "course_id": course_event.id
     }
 
