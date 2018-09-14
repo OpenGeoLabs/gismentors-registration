@@ -64,34 +64,39 @@ class RegistrationForm(forms.Form):
 
     gdpr = forms.BooleanField(
         label="Ochrana osobních údajů",
-        help_text="""Souhlasím se zpracováním poskytnutých osobních údajů a
+        help_text=mark_safe("""<p>
+        Souhlasím se zpracováním poskytnutých osobních údajů a
         zařazením do databáze uživatelů společnosti OpenGeoLabs s.r.o. se
         sídlem v Brandlova 1559/7, Praha 11, 149 00 (dále jen OpenGeoLabs
         s.r.o.) pro vlastní použití v souladu s příslušnými ustanoveními zákona
-        c. 101 / 2000 Sb. O ochraně osobních údajů a o změně některých údajů v
+        č. 101/2000 Sb., o ochraně osobních údajů a o změně některých údajů v
         platném znění. Beru na vědomí, že údaje budou využívány pouze v rámci
-        společnosti OpenGeoLabs s.r.o.. Jsem si vědom/a toho, že souhlas s
+        společnosti OpenGeoLabs s.r.o.</p>
+        <p>Jsem si vědom/a toho, že souhlas s
         jejich zpracováním mohu kdykoliv odvolat zasláním e-mailu na adresu
         info [zavináč] opengeolabs [tečka] cz. Souhlas bude automaticky
         prodloužen vždy o další roční období, pokud nedojde k jeho odvolání
         písemnou formou. Jsem si vědom/a svých práv, které subjektům poskytuje
-        zákon 101/2000 Sb., o ochraně osobních údajů. Vaše data budou použita
-        pro potřeby organizace školení GISMentors.""")
+        zákon č. 101/2000 Sb., o ochraně osobních údajů. Vaše data budou použita
+        pro potřeby organizace školení GISMentors.</p>"""))
 
     marketing = forms.BooleanField(
         required=False,
         label="Marketingová sdělení",
-        help_text=mark_safe('''Souhlasím s tím, že společnost <a
+        help_text=mark_safe('''<p>Souhlasím s tím, že společnost <a
         href="http://opengeolabs.cz">OpenGeoLabs s.r.o.</a> může využít můj
-        e-mail pro zaslání krátké marketingové zprávy (ne častěji, než
-        čtyřikrát za rok), obsahující informace o aktuálním dění ve
-        společnosti. Jsem si vědom/a toho, že souhlas použití mého e-mailu pro
+        e-mail pro zasílání krátkých marketingových zpráv (ne častěji než jednou za
+        měsíc) obsahujících nabídky a slevy kurzů a informace o aktuálním dění ve
+        společnosti.</p>
+        <p>Jsem si vědom/a toho, že souhlas použití mého e-mailu pro
         marketingové účely mohu kdykoliv odvolat zasláním e-mailu na adresu
         <abbr title="nahraďte správnoh formou e-mailu">info [zavináč] opengeolabs [tečka] cz</abbr>. Souhlas bude
         automaticky prodloužen vždy o další roční období, pokud nedojde k jeho
-        odvolání písemnou formou. Jsem si vědom/a svých práv, které subjektům
-        poskytuje zákon 101/2000 Sb., o ochraně osobních údajů. Na základě
+        odvolání písemnou formou.</p>
+        <p>Jsem si vědom/a svých práv, které subjektům
+        poskytuje zákon č. 101/2000 Sb., o ochraně osobních údajů. Na základě
         tohoto souhlasu budeme zpracovávat vaše kontaktní údaje, údaje o
-        absolvovaných kurzech u nás.'''))
+        absolvovaných kurzech u nás.
+        </p>'''))
 
     contact_fieldset = (name, email_attendee)
