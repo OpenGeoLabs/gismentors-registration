@@ -115,6 +115,7 @@ def _register_new_attendee(request, course_id):
     if len(existing_attendees) > 0:
         context = {
             "name": existing_attendees[0].attendee.name,
+            "email": attendee.email,
             "title": "{} - {}".format(course_event.course_type.title, level)
         }
         return render(request, "already_registered.html", context)
@@ -180,17 +181,19 @@ def _register_new_attendee(request, course_id):
     }
 
     send_mail(
-        '[GISmentors-kurzy] {} - {}'.format(
-            course_event.course_type.title, course_event.date
+        '[GISMentors-kurzy] {} - {} {}'.format(
+            course_event.course_type.title, level, course_event.date
         ),
         """
         Kurz: {}
         Účastník: {}
+        E-mail: {}
         Organizace: {}
         Celkem registrovaných účastníků: {}""".format(
             course_event.course_type.title,
             attendee.name,
-            invoice_detail.name,
+            attendee.email,
+            request.POST["organisation"],
             len(course_event.courseattendee_set.all())
         ),
         'info@gismentors.cz',
@@ -199,12 +202,13 @@ def _register_new_attendee(request, course_id):
     )
 
     send_mail(
-        '[GISmentors-kurzy] Potvrzení přihlášení',
+        '[GISMentors-kurzy] Potvrzení přihlášky',
         render_to_string('potvrzeni.txt', {
             'name': attendee.name,
-            "title": course_event.course_type.title,
+            "title": "{} - {}".format(course_event.course_type.title, level),
             "date": course_event.date,
             "student": student}),
+
         'info@gismentors.cz',
         [attendee.email],
         fail_silently=True,

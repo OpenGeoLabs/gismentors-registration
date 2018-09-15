@@ -10,8 +10,8 @@ VAT=1.21
 
 class CourseType(models.Model):
     class Meta:
-        verbose_name = _("Typ školení")
-        verbose_name_plural = _("Typ školení")
+        verbose_name = _("Typ kurzu")
+        verbose_name_plural = _("Typy kurzů")
 
     title = models.CharField(
             max_length=50,
@@ -90,8 +90,8 @@ class Location(models.Model):
 class CourseEvent(models.Model):
 
     class Meta:
-        verbose_name = _("Školení")
-        verbose_name_plural = _("Školení")
+        verbose_name = _("Kurz")
+        verbose_name_plural = _("Kurzy")
 
     course_type = models.ForeignKey(
             CourseType,
@@ -250,8 +250,8 @@ class InvoiceDetail(models.Model):
 
 class Attendee(models.Model):
     class Meta:
-        verbose_name = _("Učastník")
-        verbose_name_plural = _("Učastníci")
+        verbose_name = _("Účastník")
+        verbose_name_plural = _("Účastníci")
 
     name = models.CharField(
         max_length=50,
@@ -266,40 +266,46 @@ class Attendee(models.Model):
             CourseEvent,
             blank=True)
 
+    gdpr_label = "Ochrana osobních údajů"
+
+    gdpr_text = mark_safe("""<p>
+            Souhlasím se zpracováním poskytnutých osobních údajů a
+            zařazením do databáze uživatelů společnosti <a
+                    href="http://opengeolabs.cz" target="_blank">OpenGeoLabs s.r.o.</a> se
+            sídlem Brandlova 1559/7, Praha 11, 149 00 (dále jen OpenGeoLabs
+            s.r.o.) pro vlastní použití v souladu s příslušnými ustanoveními zákona
+            č. 101/2000 Sb., o ochraně osobních údajů a o změně některých údajů v
+            platném znění. Beru na vědomí, že údaje budou využívány pouze v rámci
+            společnosti OpenGeoLabs s.r.o.</p>
+            <p>Jsem si vědom/a toho, že souhlas s
+            jejich zpracováním mohu kdykoliv odvolat zasláním e-mailu na adresu
+            <abbr title="nahraďte správnou formou e-mailu">info [zavináč] opengeolabs [tečka] cz</abbr>.
+            Souhlas bude automaticky prodloužen vždy o další roční období, pokud nedojde k jeho odvolání
+            písemnou formou. Jsem si vědom/a svých práv, které subjektům poskytuje
+            zákon č. 101/2000 Sb., o ochraně osobních údajů. Vaše data budou použita
+            pro potřeby organizace kurzů GISMentors.</p>""")
+
     gdpr = models.BooleanField(
-            verbose_name=_("Souhlas se zpracováním osobních údajů"),
-            help_text=_("""Souhlasím se zpracováním poskytnutých osobních údajů
-            a zařazením do databáze uživatelů společnosti OpenGeoLabs s.r.o.
-            se sídlem v Brandlova 1559/7, Praha 11, 149 00 (dále jen
-            OpenGeoLabs s.r.o.) pro vlastní použití v souladu s příslušnými
-            ustanoveními zákona č. 101 / 2000 Sb. O ochraně osobních údajů a o
-            změně některých údajů v platném znění. Beru na vědomí, že údaje
-            budou využívány pouze v rámci společnosti OpenGeoLabs s.r.o.. Jsem
-            si vědom/a toho, že souhlas s jejich zpracováním mohu kdykoliv
-            odvolat zasláním e-mailu na adresu info [zavináč] opengeolabs
-            [tečka] cz. Souhlas bude automaticky prodloužen vždy o další roční
-            období, pokud nedojde k jeho odvolání písemnou formou. Jsem si
-            vědom/a svých práv, které subjektům poskytuje zákon 101/2000 Sb., o
-            ochraně osobních údajů. Vaše data budou použita pro potřeby
-            organizace školení GISMentors.
-            """))
+            verbose_name=gdpr_label,
+            help_text=gdpr_text)
+
+    marketing_label = "Marketingová sdělení"
+
+    marketing_text = mark_safe("""<p>Souhlasím s tím, že společnost <a
+            href="http://opengeolabs.cz" target="_blank">OpenGeoLabs s.r.o.</a> může využít můj
+            e-mail pro zasílání krátkých marketingových zpráv (ne častěji než jednou za
+            měsíc) obsahujících nabídky a slevy kurzů a informace o aktuálním dění ve
+            společnosti.</p>
+            <p>Jsem si vědom/a toho, že souhlas s použitím mého e-mailu pro
+            marketingové účely mohu kdykoliv odvolat zasláním e-mailu na adresu
+            <abbr title="nahraďte správnou formou e-mailu">info [zavináč] opengeolabs [tečka] cz</abbr>. Souhlas bude
+            automaticky prodloužen vždy o další roční období, pokud nedojde k jeho
+            odvolání písemnou formou.</p>
+            """)
 
     marketing = models.BooleanField(
-            verbose_name=_("Souhlas s posíláním marketingových materiálů"),
-            help_text=_("""Souhlasím s tím, že společnost OpenGeoLabs s.r.o.
-            může využít můj e-mail pro zaslání krátké marketingové zprávy (ne
-            častěji, než čtyřikrát za rok), obsahující informace o slevách a
-            mimořádných nabídkách a informace o aktuálním dění ve společnosti.
-            Jsem si vědom/a toho, že souhlas použití mého e-mailu
-            pro marketingové účely mohu kdykoliv odvolat zasláním
-            e-mailu na adresu info [zavináč] opengeolabs [tečka]
-            cz. Souhlas bude automaticky prodloužen vždy o další
-            roční období, pokud nedojde k jeho odvolání písemnou
-            formou. Jsem si vědom/a svých práv, které subjektům
-            poskytuje zákon 101/2000 Sb., o ochraně osobních údajů.
-            Na základě tohoto souhlasu budeme zpracovávat vaše
-            kontaktní údaje, údaje o absolvovaných kurzech u nás.
-            """))
+            verbose_name=marketing_label,
+            help_text=marketing_text)
 
     date_signed = models.DateField(
             auto_now=True)
@@ -310,8 +316,8 @@ class Attendee(models.Model):
 
 class CourseAttendee(models.Model):
     class Meta:
-        verbose_name = _("Učastník kurzu")
-        verbose_name_plural = _("Učastníci kurzu")
+        verbose_name = _("Účast na kurzu")
+        verbose_name_plural = _("Účasti na kurzech")
 
     attendee = models.ForeignKey(
             "Attendee",
