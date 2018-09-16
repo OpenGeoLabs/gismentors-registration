@@ -310,6 +310,11 @@ class Attendee(models.Model):
     date_signed = models.DateField(
             auto_now=True)
 
+    token = models.CharField(
+        max_length=255,
+        verbose_name=_("Token"))
+
+
     def __str__(self):
         return self.name
 
@@ -347,6 +352,7 @@ class CourseAttendee(models.Model):
             choices=level_choices)
 
     note = models.TextField(
+            blank=True,
             verbose_name=_("Poznámka"))
 
     topics = models.TextField(
@@ -363,7 +369,6 @@ class CourseAttendee(models.Model):
 
     token = models.CharField(
         max_length=255,
-        default=uuid.uuid4(),
         verbose_name=_("Token"))
 
     invoice_detail = models.ForeignKey(

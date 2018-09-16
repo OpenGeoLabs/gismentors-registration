@@ -24,7 +24,7 @@ class RegistrationForm(forms.Form):
         required=False, max_length=50, label=_('Organizace'))
 
     street = forms.CharField(label=_('Ulice a číslo popisné'),
-                            max_length=50)
+                             max_length=50)
 
     city = forms.CharField(label=_('Město'), max_length=50)
 
@@ -53,14 +53,17 @@ class RegistrationForm(forms.Form):
 
     topics = forms.CharField(
         label=_('Témata na tento kurz'), required=False,
+        widget=forms.Textarea,
         help_text="Máte nějaké téma, které byste rádi na kurzu probrali?")
 
     next_topics = forms.CharField(
         label=_('Témata na další kurzy'), required=False,
+        widget=forms.Textarea,
         help_text="Zajímá Vás nějaký širší okruh, na který jsme zatím nevypsali školení?")
 
     note = forms.CharField(
         label=_('Poznámka pro organizátory'), required=False,
+        widget=forms.Textarea,
         help_text="Cokoliv nám chcete sdělit")
 
     gdpr = forms.BooleanField(

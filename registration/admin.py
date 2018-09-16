@@ -82,6 +82,10 @@ class CourseEventInline(admin.TabularInline):
 class AttendeeAdmin(admin.ModelAdmin):
     list_display = ("name", "email", "date_signed")
 
+    fields = ("name", "email", "courses", "gdpr", "marketing",
+              "token")
+    readonly_fields = ("token", "date_signed")
+
 
 class CourseAdmin(admin.ModelAdmin):
     list_display = ("course_type", "date", "attendees")

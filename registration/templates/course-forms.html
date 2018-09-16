@@ -187,37 +187,41 @@ Poznámka: {{ course.note }}
     </div>
     <!-- //-->
     <div class="card border-light">
-    <fieldset>
-        <div class="card-header">
-            <legend>GDPR a ochrana osobních údajů</legend>
-        </div>
-        <div class="card-body">
-            <div class="form-group mb-2 mr-sm-2">
-                {{ form.gdpr.errors }}
-                {{ form.gdpr.label_tag }}
-                {{ form.gdpr }}
-                <small class="form-text text-muted">{{ form.gdpr.help_text }}</small>
-            </div>
-            <br />
-            <div class="form-group mb-2 mr-sm-2">
-                {{ form.marketing.errors }}
-                {{ form.marketing.label_tag }}
-                {{ form.marketing }}
-                <small class="form-text text-muted">{{ form.marketing.help_text }}</small>
-            </div>
+        <fieldset>
+                <div class="card-header">
+                <legend>GDPR a ochrana osobních údajů</legend>
+                </div>
+                <div class="card-body">
+                <div class="form-group mb-2 mr-sm-2">
+                        {{ form.gdpr.errors }}
+                        {{ form.gdpr.label_tag }}
+                        {{ form.gdpr }}
+                        <small class="form-text text-muted">{{ form.gdpr.help_text }}</small>
+                </div>
+                <br />
+                <div class="form-group mb-2 mr-sm-2">
+                        {{ form.marketing.errors }}
+                        {{ form.marketing.label_tag }}
+                        {{ form.marketing }}
+                        <small class="form-text text-muted">{{ form.marketing.help_text }}</small>
+                </div>
 
-        </div>
-    </fieldset>
+                </div>
+        </fieldset>
+    </div>
+    <div class="card border-light">
+            <div class="card-body">
+                    {{ form.captcha.errors }}
+                    {{ form.captcha.label_tag }}<br />
+                    {{ form.captcha }}
+                    <button class='btn btn-outline-primary js-captcha-refresh'>Načíst jiný obrázek</button>
+                    <br />
+
+            <small class="form-text text-muted">{{ form.captcha.help_text }}</small>
+            </div>
     </div>
 
-{{ form.captcha.errors }}
-{{ form.captcha.label_tag }}<br />
-{{ form.captcha }}
-<button class='btn btn-primary mb-3 js-captcha-refresh'>Načíst jiný obrázek</button>
-<small class="form-text text-muted">{{ form.captcha.help_text }}</small>
-
-
-<button class="btn btn-primary mb-2" type="submit">Odeslat závaznou přihlášku</button>
+    <button class="btn btn-primary mb-2" type="submit">Odeslat závaznou přihlášku</button>
 
 <script type="text/javascript">
 $('.js-captcha-refresh').click(function () {

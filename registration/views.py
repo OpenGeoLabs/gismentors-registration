@@ -99,6 +99,7 @@ def _register_new_attendee(request, course_id):
                 email=request.POST["email_attendee"],
                 gdpr=gdpr,
                 marketing=marketing,
+                token=uuid.uuid1(),
                 date_signed=datetime.date.today())
         new_attendee.save()
         attendee = new_attendee
@@ -129,7 +130,7 @@ def _register_new_attendee(request, course_id):
             note=request.POST["note"],
             topics=request.POST["topics"],
             next_topics=request.POST["next_topics"],
-            token=request.POST["csrfmiddlewaretoken"]
+            token=uuid.uuid1()
     )
 
     attendee.courses.add(course_event)
