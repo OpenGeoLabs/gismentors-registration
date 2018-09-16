@@ -9,6 +9,7 @@ from django.template.loader import render_to_string
 import datetime
 import uuid
 
+from .models import VAT
 from .models import CourseType
 from .models import CourseEvent
 from .models import Attendee
@@ -181,6 +182,8 @@ def _register_new_attendee(request, course_id):
             "course_id": course_event.id
     }
 
+    suma = sum([int(attendee.invoice_detail.amount) for attendee in course_event.courseattendee_set.all()])
+
     send_mail(
         '[GISMentors-kurzy] {} - {} {}'.format(
             course_event.course_type.title, level, course_event.date
@@ -190,12 +193,15 @@ def _register_new_attendee(request, course_id):
         Účastník: {}
         E-mail: {}
         Organizace: {}
-        Celkem registrovaných účastníků: {}""".format(
+        Celkem registrovaných účastníků: {}
+        Celkem peněz (bez DPH): {}
+        """.format(
             course_event.course_type.title,
             attendee.name,
             attendee.email,
             request.POST["organisation"],
-            len(course_event.courseattendee_set.all())
+            len(course_event.courseattendee_set.all()),
+            suma
         ),
         'info@gismentors.cz',
         [settings.INFO_MAIL],
@@ -208,8 +214,8 @@ def _register_new_attendee(request, course_id):
             'name': attendee.name,
             "title": "{} - {}".format(course_event.course_type.title, level),
             "date": course_event.date,
-            "student": student}),
-
+            "amount": amount*VAT
+        }),
         'info@gismentors.cz',
         [attendee.email],
         fail_silently=True,

@@ -231,7 +231,7 @@ class InvoiceDetail(models.Model):
     email = models.EmailField(
             verbose_name=_("Kontaktní e-mail"))
 
-    amount = models.EmailField(
+    amount = models.IntegerField(
             verbose_name=_("Částka"), help_text="Částka bez DPH")
 
     invoice = models.FileField(
