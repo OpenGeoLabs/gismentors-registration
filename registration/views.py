@@ -214,7 +214,7 @@ def _register_new_attendee(request, course_id):
             'name': attendee.name,
             "title": "{} - {}".format(course_event.course_type.title, level),
             "date": course_event.date,
-            "amount": amount*VAT
+            "amount": int(amount*VAT)
         }),
         'info@gismentors.cz',
         [attendee.email],
