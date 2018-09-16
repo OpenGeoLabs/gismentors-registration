@@ -10,8 +10,9 @@ Student: Ano
 {% endif %}
 
 Detailní propozice a informace k platbě Vám zašleme e-mailem nejpozději 14 dní před konáním kurzu.
+V případě malého zájmu si vyhrazujeme právo kurz zrušit. I tuto informaci Vám sdělíme e-mailem nejpozději 14 dní před konáním kurzu.
 
-V případě jakýchkoliv dotazů nás prosím kontaktujte na adrese info@gismentors.cz.
+Pokud budete mít jakýkoliv dotaz, kontaktujte nás prosím na adrese info@gismentors.cz.
 
 Děkujeme za Vaši přízeň,
 
