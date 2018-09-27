@@ -131,6 +131,7 @@ def _register_new_attendee(request, course_id):
             note=request.POST["note"],
             topics=request.POST["topics"],
             next_topics=request.POST["next_topics"],
+            attended=False,
             token=uuid.uuid1()
     )
 

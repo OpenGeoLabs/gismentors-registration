@@ -375,6 +375,8 @@ class CourseAttendee(models.Model):
         "InvoiceDetail",
         on_delete=models.PROTECT)
 
+    attended = models.BooleanField(default=False)
+
 
     def __str__(self):
         return self.attendee.name

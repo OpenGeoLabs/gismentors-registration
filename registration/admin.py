@@ -38,7 +38,7 @@ class AddressInline(admin.StackedInline):
 
 class CourseAttendeeInline(admin.TabularInline):
     model = CourseAttendee
-    fields = ("attendee", "student", "registration_date")
+    fields = ("attendee", "student", "attended", "registration_date")
     readonly_fields = ("attendee", "registration_date", )
     extra = 0
 
@@ -96,7 +96,7 @@ class CourseAdmin(admin.ModelAdmin):
 
 class CourseAttendeeAdmin(admin.ModelAdmin):
     list_display = ("attendee_name", "course_name", "registration_date",
-                    "student")
+                    "student", "attended")
 
     list_filter = ("course", )
 
