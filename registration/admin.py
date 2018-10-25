@@ -1,6 +1,7 @@
 from django.contrib import admin
 import datetime
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.query import QuerySet
 
 from leaflet.admin import LeafletGeoAdmin
 
@@ -30,6 +31,18 @@ class DateFilter(admin.SimpleListFilter):
             return CourseEvent.objects.filter(pk=val)
         else:
             return CourseEvent.objects.all()
+
+
+class InvoiceDateFilter(DateFilter):
+
+    def queryset(self, request, queryset):
+        val = self.value()
+        if val:
+            course_event = CourseEvent.objects.get(pk=val)
+            return InvoiceDetail.objects.filter(
+                courseattendee__course=course_event)
+        else:
+            return InvoiceDetail.objects.all()
 
 
 class AddressInline(admin.StackedInline):
@@ -91,31 +104,50 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ("course_type", "date", "attendees")
 
     def attendees(self, course_event):
-        return course_event.courseattendee_set.count()
+        return course_event.course_attendee_set.count()
 
 
 class CourseAttendeeAdmin(admin.ModelAdmin):
-    list_display = ("attendee_name", "course_name", "registration_date",
+    list_display = ("attendee_name", "course_id", "registration_date",
                     "student", "attended")
 
     list_filter = ("course", )
+    list_editable = ('attended',)
 
     def attendee_name(self, ca):
         return ca.attendee.name
 
-    def course_name(self, ca):
-        return ca.course.course_type
+    def course_id(self, course_attendee):
+
+        course_date = course_attendee.course.date
+        course_name = course_attendee.course.course_type.title
+        course_level = course_attendee.course.course_type.level_choices[
+                       course_attendee.course.course_type.level][1]
+        return "{} - {} {}".format(course_name, course_level, course_date)
 
 
 class InvoiceDetailAdmin(admin.ModelAdmin):
-    list_display = ("organisation", "invoice")
+    list_display = ("organisation", "course_id", "amount", "address", "ico",
+                    "dic", "objednavka", "email")
+
     inlines = (CourseAttendeeInline, )
+    list_filter = (InvoiceDateFilter, )
 
     def organisation(self, invoice_detail):
         return invoice_detail.name
 
     def invoice(self, invoice_detail):
         return invoice_detail.invoice
+
+    def course_id(self, invoice_detail):
+        course_attendee = CourseAttendee.objects.get(invoice_detail=invoice_detail)
+
+        course_date = course_attendee.course.date
+        course_name = course_attendee.course.course_type.title
+        course_level = course_attendee.course.course_type.level_choices[
+                       course_attendee.course.course_type.level][1]
+        
+        return "{} - {} {}".format(course_name, course_level, course_date)
 
 
 admin.site.register(CourseType)

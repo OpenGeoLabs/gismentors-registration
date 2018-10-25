@@ -147,8 +147,8 @@ def _register_new_attendee(request, course_id):
     else:
         amount = course_event.price_late
 
-    invoice_text = "{} - {}".format(course_event.course_type.title,
-                                    level)
+    invoice_text = "{} - {} {}".format(course_event.course_type.title,
+                                    level, course_event.date)
 
     name = request.POST["organisation"]
     if not name:
