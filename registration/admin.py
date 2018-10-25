@@ -128,7 +128,7 @@ class CourseAttendeeAdmin(admin.ModelAdmin):
 
 class InvoiceDetailAdmin(admin.ModelAdmin):
     list_display = ("organisation", "course_id", "amount", "address", "ico",
-                    "dic", "objednavka", "email")
+                    "dic", "objednavka", "email", "note")
 
     inlines = (CourseAttendeeInline, )
     list_filter = (InvoiceDateFilter, )
@@ -146,8 +146,12 @@ class InvoiceDetailAdmin(admin.ModelAdmin):
         course_name = course_attendee.course.course_type.title
         course_level = course_attendee.course.course_type.level_choices[
                        course_attendee.course.course_type.level][1]
-        
+
         return "{} - {} {}".format(course_name, course_level, course_date)
+
+    def note(self, invoice_detail):
+        course_attendee = CourseAttendee.objects.get(invoice_detail=invoice_detail)
+        return course_attendee.note
 
 
 admin.site.register(CourseType)
