@@ -25,6 +25,7 @@ Now you have to adjust the `settings.py` file
 3. Add `django.contrib.gis` to `INSTALLED_APPS`
 4. Adjust database engine for support of spatial models https://docs.djangoproject.com/en/1.11/ref/contrib/gis/tutorial/#configure-settings-py
 5. If using `spatialite`, use `SPATIALITE_LIBRARY_PATH` settings option
+6. Set `TEST_TITLE` and `TEST_KEY` variables
 
 In `settings.py`:
 
@@ -67,6 +68,11 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASEDIR, "media")
 
+```
+
+```
+TEST_KEY=831239ad-3b93-4624-9529-6bc67970f541
+TEST_TITLE='testovaci kurz'
 ```
 
 
