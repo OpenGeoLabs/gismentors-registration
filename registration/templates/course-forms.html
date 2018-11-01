@@ -53,7 +53,12 @@ Poznámka: {{ course.note }}
     </div>
 </div>
 
-<form action="{% url 'course' course.id %}" method="post" class="needs-validation" validate>
+{% if not test_env %}
+    <form action="{% url 'course' course.id %}" method="post" class="needs-validation" validate>
+{% else %}
+    <form action="{% url 'course' course.id %}?env={{ test_env }}" method="post" class="needs-validation" validate>
+{% endif %}
+
 {% csrf_token %}
 
 {{ form.non_field_errors }}
@@ -209,6 +214,7 @@ Poznámka: {{ course.note }}
                 </div>
         </fieldset>
     </div>
+    {% if not test_env %}
     <div class="card border-light">
             <div class="card-body">
                     {{ form.captcha.errors }}
@@ -220,6 +226,7 @@ Poznámka: {{ course.note }}
             <small class="form-text text-muted">{{ form.captcha.help_text }}</small>
             </div>
     </div>
+    {% endif %}
 
     <button class="btn btn-primary mb-2" type="submit">Odeslat závaznou přihlášku</button>
 
@@ -230,7 +237,6 @@ $('.js-captcha-refresh').click(function () {
         $('#id_captcha_0').val(result['key'])
     });
 
-    console.log("TEST");
     return false;
 });
 
