@@ -65,7 +65,7 @@ class LocationAdmin(LeafletGeoAdmin):
 
 class CourseEventAdmin(admin.ModelAdmin):
     inlines = [CourseAttendeeInline]
-    list_display = ("course_name", "level", "status", "date", "attendees", "days_left")
+    list_display = ("course_name", "level", "date", "early_date", "attendees", "days_left", "status")
 
     list_filter = (DateFilter, )
 
@@ -93,7 +93,7 @@ class CourseEventInline(admin.TabularInline):
 
 
 class AttendeeAdmin(admin.ModelAdmin):
-    list_display = ("name", "email", "date_signed")
+    list_display = ("name", "email", "gdpr", "marketing", "date_signed")
 
     fields = ("name", "email", "courses", "gdpr", "marketing",
               "token")
@@ -108,14 +108,20 @@ class CourseAdmin(admin.ModelAdmin):
 
 
 class CourseAttendeeAdmin(admin.ModelAdmin):
-    list_display = ("attendee_name", "course_id", "registration_date",
-                    "student", "attended")
+    list_display = ("attendee_name", "attendee_email", "organisation", "student", "course_id",
+                    "attended")
 
     list_filter = ("course", )
     list_editable = ('attended',)
 
     def attendee_name(self, ca):
         return ca.attendee.name
+
+    def attendee_email(self, ca):
+        return ca.attendee.email
+
+    def organisation(self, ca):
+        return ca.invoice_detail.name
 
     def course_id(self, course_attendee):
 
