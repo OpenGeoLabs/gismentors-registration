@@ -8,6 +8,12 @@ from django.template.loader import render_to_string
 
 import datetime
 import uuid
+import tempfile
+import os
+import zipfile
+from shutil import copyfile
+
+from registration import utils
 
 from .models import VAT
 from .models import CourseType
@@ -16,6 +22,8 @@ from .models import Attendee
 from .models import CourseAttendee
 from .models import InvoiceDetail
 from .forms import RegistrationForm
+
+from certifikat import generate_certificate
 
 
 def courses_json(request):
@@ -273,3 +281,56 @@ def course(request, course_id):
         return _register_new_attendee(request, course_id)
     else:
         return _empty_form(request, course_id)
+
+
+def certificates(request, course_id):
+    """Generate certificates for given course
+    """
+    course_event = get_object_or_404(CourseEvent, pk=course_id)
+
+    attendees = course_event.courseattendee_set.all()
+
+    temp_dir = tempfile.mkdtemp(prefix="gismentors-certificates-")
+    temp_file = "{}.zip".format(temp_dir)
+    os.mkdir(os.path.join(temp_dir, "certs"))
+    os.mkdir(os.path.join(temp_dir, "images"))
+
+    certificate_template = utils.get_certificate_template(course_event)
+    copyfile(
+        course_event.course_type.image.path,
+        os.path.join(temp_dir, course_event.course_type.image.name)
+    )
+
+    os.chdir(temp_dir)
+
+    with zipfile.ZipFile(temp_file, 'w') as myzip:
+
+        myzip.write(course_event.course_type.image.name)
+
+        for attendee in attendees:
+            file_name = generate_certificate.generate(
+                certificate_template,
+                attendee.attendee.name,
+                course_event.date.strftime("%d.%m.%Y"),
+                course_event.date.strftime("%d.%m.%Y"),
+                "{}-{}-{}.tex".format(
+                    course_event.date.strftime("%Y-%m-%d"),
+                    course_event.course_type.title,
+                    str(attendee.id)
+                ),
+                course_event.address.city,
+                course_event.course_type.image.path
+            )
+
+            myzip.write(os.path.basename(file_name))
+
+    with open(temp_file, 'rb') as myzip:
+        response = HttpResponse(myzip.read())
+        response['Content-Disposition'] = 'attachment; filename={}-{}.zip'.format(
+                    course_event.date.strftime("%Y-%m-%d"),
+                    course_event.course_type.title
+        ),
+        response['Content-Type'] = 'application/x-zip'
+    return response
+
+

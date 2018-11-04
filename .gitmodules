@@ -1,0 +1,4 @@
+[submodule "certifikat"]
+	path = certifikat
+	url = https://github.com/gismentors/certifikat.git
+	branch = django

@@ -12,6 +12,7 @@ from .models import InvoiceDetail
 from .models import Attendee
 from .models import CourseAttendee
 from .models import Address
+from .models import Lector
 
 class DateFilter(admin.SimpleListFilter):
     """Filter for admin interface of NUTS3 regions (Kraje)
@@ -160,6 +161,7 @@ class InvoiceDetailAdmin(admin.ModelAdmin):
         return course_attendee.note
 
 
+admin.site.register(Lector)
 admin.site.register(CourseType)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(CourseEvent, CourseEventAdmin)

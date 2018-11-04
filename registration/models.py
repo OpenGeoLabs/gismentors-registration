@@ -5,8 +5,22 @@ import uuid
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
+from registration import utils
 
 VAT=1.21
+
+class Lector(models.Model):
+    class Meta:
+        verbose_name = _("Školitel")
+        verbose_name_plural = _("Školitelé")
+
+    name = models.TextField(
+        max_length=256,
+        verbose_name=_("Lector name")
+    )
+
+    def __str__(self):
+        return self.name
 
 class CourseType(models.Model):
     class Meta:
@@ -45,6 +59,37 @@ class CourseType(models.Model):
             verbose_name=_("Rozvrh")
     )
 
+    certificate_content = models.TextField(
+            verbose_name=_("Obsah certifikátu")
+    )
+
+    ####
+    # NOTE: choices are part of the database, you have to run 
+    # ```
+    # git submodule update certifikat
+    # ```
+    #
+    #  and
+    #
+    # ```
+    # python manage.py makemigrations --name "certificate-template-update"`
+    # python migrate
+    # ```
+    #
+    # when ever new template is added to certifikat repository
+    ####
+
+    certificate_template = models.TextField(
+        choices=utils.get_certificate_templates(),
+        verbose_name=_("Šablona certifikátu")
+    )
+
+    certificate_content = models.TextField(
+            verbose_name=_("Obsah certifikátu")
+    )
+
+    lectors = models.ManyToManyField(Lector)
+
     def __str__(self):
 
         level = dict(self.level_choices)[self.level][0:3]
@@ -67,7 +112,7 @@ class Address(models.Model):
 
     location = models.OneToOneField("Location",
             on_delete=models.CASCADE
-            )
+    )
 
 class Location(models.Model):
     class Meta:
@@ -134,8 +179,8 @@ class CourseEvent(models.Model):
             verbose_name=_("Včasná registrace")
     )
 
-    location = models.ForeignKey(
-            Location,
+    address = models.ForeignKey(
+            Address,
             on_delete=models.CASCADE,
             verbose_name=_("Místo konání")
     )
