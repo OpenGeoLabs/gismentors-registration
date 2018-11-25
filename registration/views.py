@@ -37,7 +37,7 @@ def courses_atom(request):
 
 
 def courses(request):
-    latest_courses_list = CourseEvent.objects.exclude(status=CourseEvent.CREATED).filter(date__gte=datetime.date.today()).order_by('date')
+    latest_courses_list = CourseEvent.objects.exclude(status=CourseEvent.CREATED).filter(date__gt=datetime.date.today()).order_by('date')
     context = {
         'latest_courses_list': latest_courses_list,
         "level_choices": CourseType.level_choices
