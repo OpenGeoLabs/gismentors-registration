@@ -69,7 +69,21 @@ tr.declined td {
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
   data-admin-utc-offset="{% now "Z" %}">
 
-{% include "navigation.html" %}
+<header class="page-header">
+    <div class="logo_header">
+        <a href="http://gismentors.cz" class="logolink">
+            <img class="gismentors_logo" alt="GISMentors logo" src="http://opengeolabs.cz/wp-content/uploads/2014/12/opengeolabs-logo1.png" />
+         </a>
+        <h1>GISMentors</h1>
+    </div>
+   {% block navigation %}
+    <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">Seznam kurzů</li>
+    </ol>
+    </nav>
+   {% endblock %}
+</header>
 
 <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content">
     {% block body %}
