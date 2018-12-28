@@ -67,6 +67,7 @@ class LocationAdmin(LeafletGeoAdmin):
 class CourseEventAdmin(admin.ModelAdmin):
     inlines = [CourseAttendeeInline]
     list_display = ("course_name", "level", "date", "early_date", "attendees", "days_left", "status")
+    change_list_template = "courseevent_admin_template.html"
 
     list_filter = (DateFilter, )
 

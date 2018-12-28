@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
 
 import datetime
 import uuid
@@ -12,6 +13,7 @@ import tempfile
 import os
 import zipfile
 from shutil import copyfile
+import pathlib
 
 from registration import utils
 
@@ -283,8 +285,10 @@ def course(request, course_id):
         return _empty_form(request, course_id)
 
 
+@login_required(login_url='/admin/login/')
 def certificates(request, course_id):
-    """Generate certificates for given course
+    """Generate certificates for given course, save them to ZIP file and return
+    back
     """
     course_event = get_object_or_404(CourseEvent, pk=course_id)
 
@@ -302,6 +306,15 @@ def certificates(request, course_id):
     )
 
     os.chdir(temp_dir)
+    copyfile(course_event.course_type.image.path,
+             course_event.course_type.image.name)
+    copyfile(
+                pathlib.Path(
+                    pathlib.Path(generate_certificate.__file__).parent,
+                    "images/placka-eps-converted-to.pdf"
+                ),
+                "placka-eps-converted-to.pdf"
+            )
 
     with zipfile.ZipFile(temp_file, 'w') as myzip:
 
@@ -312,24 +325,25 @@ def certificates(request, course_id):
                 certificate_template,
                 attendee.attendee.name,
                 course_event.date.strftime("%d.%m.%Y"),
-                course_event.date.strftime("%d.%m.%Y"),
                 "{}-{}-{}.tex".format(
                     course_event.date.strftime("%Y-%m-%d"),
                     course_event.course_type.title,
                     str(attendee.id)
                 ),
                 course_event.address.city,
-                course_event.course_type.image.path
+                pathlib.Path(course_event.course_type.image.path).name,
+                [l.name for l in course_event.lectors.all()]
             )
 
             myzip.write(os.path.basename(file_name))
+            myzip.write("placka-eps-converted-to.pdf")
 
     with open(temp_file, 'rb') as myzip:
         response = HttpResponse(myzip.read())
-        response['Content-Disposition'] = 'attachment; filename={}-{}.zip'.format(
+        response['Content-Disposition'] = 'attachment; filename=certifikaty-{}-{}.zip'.format(
                     course_event.date.strftime("%Y-%m-%d"),
                     course_event.course_type.title
-        ),
+        )
         response['Content-Type'] = 'application/x-zip'
     return response
 

@@ -14,7 +14,7 @@ class Lector(models.Model):
         verbose_name = _("Školitel")
         verbose_name_plural = _("Školitelé")
 
-    name = models.TextField(
+    name = models.CharField(
         max_length=256,
         verbose_name=_("Lector name")
     )
@@ -88,8 +88,6 @@ class CourseType(models.Model):
             verbose_name=_("Obsah certifikátu")
     )
 
-    lectors = models.ManyToManyField(Lector)
-
     def __str__(self):
 
         level = dict(self.level_choices)[self.level][0:3]
@@ -113,6 +111,10 @@ class Address(models.Model):
     location = models.OneToOneField("Location",
             on_delete=models.CASCADE
     )
+
+    def __str__(self):
+        return "{organisation} - {city}".format(organisation=self.organisation,
+                                                city=self.city)
 
 class Location(models.Model):
     class Meta:
@@ -214,6 +216,8 @@ class CourseEvent(models.Model):
             help_text=_("""Kč, bez DPH"""),
             default=1000
     )
+
+    lectors = models.ManyToManyField(Lector)
 
     @property
     def vat_regular(self):

@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name='Lector',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.TextField(max_length=256, verbose_name='Lector name')),
+                ('name', models.CharField(max_length=256, verbose_name='Lector name')),
             ],
             options={
                 'verbose_name': 'Školitel',
@@ -29,19 +29,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='courseevent',
             name='address',
-            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to='registration.Address', verbose_name='Místo konání'),
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='registration.Address', verbose_name='Místo konání'),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='coursetype',
             name='certificate_content',
-            field=models.TextField(default=None, verbose_name='Obsah certifikátu'),
+            field=models.TextField(default="", verbose_name='Obsah certifikátu'),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='coursetype',
             name='certificate_template',
-            field=models.TextField(choices=[('qgis-zacatecnik.tex', 'qgis-zacatecnik.tex'), ('postgis-zacatecnik.tex', 'postgis-zacatecnik.tex'), ('geopython-zacatecnik.tex', 'geopython-zacatecnik.tex'), ('postgis-pokrocily.tex', 'postgis-pokrocily.tex'), ('qgis-pokrocily.tex', 'qgis-pokrocily.tex'), ('grass-gis-zacatecnik.tex', 'grass-gis-zacatecnik.tex')], default=None, verbose_name='Šablona certifikátu'),
+            field=models.TextField(default="qgis-zacatecnik.tex", choices=[('qgis-zacatecnik.tex', 'qgis-zacatecnik.tex'), ('postgis-zacatecnik.tex', 'postgis-zacatecnik.tex'), ('geopython-zacatecnik.tex', 'geopython-zacatecnik.tex'), ('postgis-pokrocily.tex', 'postgis-pokrocily.tex'), ('2018-vumop', '2018-vumop'), ('qgis-pokrocily.tex', 'qgis-pokrocily.tex'), ('geopython.tex', 'geopython.tex'), ('presov.tex', 'presov.tex'), ('grass-gis-zacatecnik.tex', 'grass-gis-zacatecnik.tex')], verbose_name='Šablona certifikátu'),
             preserve_default=False,
         ),
         migrations.AlterField(
@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='coursetype',
+            model_name='courseevent',
             name='lectors',
             field=models.ManyToManyField(to='registration.Lector'),
         ),
