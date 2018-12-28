@@ -2,6 +2,7 @@ from django.contrib import admin
 import datetime
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.query import QuerySet
+from django.http import HttpResponse
 
 from leaflet.admin import LeafletGeoAdmin
 
@@ -13,6 +14,8 @@ from .models import Attendee
 from .models import CourseAttendee
 from .models import Address
 from .models import Lector
+from .views import get_certificates_zip
+
 
 class DateFilter(admin.SimpleListFilter):
     """Filter for admin interface of NUTS3 regions (Kraje)
@@ -64,10 +67,33 @@ class LocationAdmin(LeafletGeoAdmin):
     default_lat = 6430000
 
 
+def get_certificates(modeladmin, request, queryset):
+    outzip = None
+    if len(queryset) > 1:
+        # zips = []
+        # temp_file = tempfile.mkstemp(prefix="gismentors-certificates-",
+        #                              suffix=".zip")
+        # with zipfile.ZipFile(temp_file, 'w') as myzip:
+        # for evt in queryset:
+        #     myzip.write(os.path.basename(file_name))
+
+        # myzip.write(course_event.course_type.image.name)
+        print("Not implemented")
+    else:
+        outzip = get_certificates_zip(queryset[0].id)
+
+    with open(outzip, 'rb') as myzip:
+        response = HttpResponse(myzip.read())
+        response['Content-Disposition'] = 'attachment; filename=certifikaty.zip'
+        response['Content-Type'] = 'application/x-zip'
+    return response
+
+get_certificates.short_description = _("Stáhnout certifikáty")
+
 class CourseEventAdmin(admin.ModelAdmin):
     inlines = [CourseAttendeeInline]
     list_display = ("course_name", "level", "date", "early_date", "attendees", "days_left", "status")
-    change_list_template = "courseevent_admin_template.html"
+    actions = [get_certificates]
 
     list_filter = (DateFilter, )
 

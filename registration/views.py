@@ -284,12 +284,8 @@ def course(request, course_id):
     else:
         return _empty_form(request, course_id)
 
+def get_certificates_zip(course_id):
 
-@login_required(login_url='/admin/login/')
-def certificates(request, course_id):
-    """Generate certificates for given course, save them to ZIP file and return
-    back
-    """
     course_event = get_object_or_404(CourseEvent, pk=course_id)
 
     attendees = course_event.courseattendee_set.all()
@@ -338,7 +334,18 @@ def certificates(request, course_id):
             myzip.write(os.path.basename(file_name))
             myzip.write("placka-eps-converted-to.pdf")
 
-    with open(temp_file, 'rb') as myzip:
+    return temp_file
+
+
+@login_required(login_url='/admin/login/')
+def certificates(request, course_id):
+    """Generate certificates for given course, save them to ZIP file and return
+    back
+    """
+
+    course_event = get_object_or_404(CourseEvent, pk=course_id)
+    outzip = get_certificates_zip(course_id)
+    with open(outzip, 'rb') as myzip:
         response = HttpResponse(myzip.read())
         response['Content-Disposition'] = 'attachment; filename=certifikaty-{}-{}.zip'.format(
                     course_event.date.strftime("%Y-%m-%d"),
