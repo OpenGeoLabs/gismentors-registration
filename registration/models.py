@@ -158,7 +158,7 @@ class CourseEvent(models.Model):
             verbose_name="Standardní",
             help_text=_("""Kč, bez DPH<br />
         <dl>
-        <dt>Začátečník</dt><dd>6000</dd>
+        <dt>Začátečník</dt><dd>5000</dd>
         <dt>Pokročilý</dt><dd>7000</dd>
         </dl>
         """)

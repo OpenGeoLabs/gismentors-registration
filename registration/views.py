@@ -198,7 +198,33 @@ def _register_new_attendee(request, course_id):
 
     suma = sum([int(attendee.invoice_detail.amount) for attendee in course_event.courseattendee_set.all()])
 
-    if not is_test:
+    if is_test:
+
+        send_mail(
+            '[GISMentors-kurzy] {} - {} {}'.format(
+                course_event.course_type.title, level, course_event.date
+            ),
+            """
+            Kurz: {}
+            Účastník: {}
+            E-mail: {}
+            Organizace: {}
+            Celkem registrovaných účastníků: {}
+            Celkem peněz (bez DPH): {}
+            """.format(
+                course_event.course_type.title,
+                attendee.name,
+                attendee.email,
+                request.POST["organisation"],
+                len(course_event.courseattendee_set.all()),
+                suma
+            ),
+            'info@gismentors.cz',
+            [settings.TEST_MAIL],
+            fail_silently=True,
+        )
+
+    else:
 
         send_mail(
             '[GISMentors-kurzy] {} - {} {}'.format(
@@ -224,18 +250,18 @@ def _register_new_attendee(request, course_id):
             fail_silently=True,
         )
 
-        send_mail(
-            '[GISMentors-kurzy] Potvrzení přihlášky',
-            render_to_string('potvrzeni.txt', {
-                'name': attendee.name,
-                "title": "{} - {}".format(course_event.course_type.title, level),
-                "date": course_event.date,
-                "amount": int(amount*VAT)
-            }),
-            'info@gismentors.cz',
-            [attendee.email],
-            fail_silently=True,
-        )
+    send_mail(
+        '[GISMentors-kurzy] Potvrzení přihlášky',
+        render_to_string('potvrzeni.txt', {
+            'name': attendee.name,
+            "title": "{} - {}".format(course_event.course_type.title, level),
+            "date": course_event.date,
+            "amount": int(amount*VAT)
+        }),
+        'info@gismentors.cz',
+        [attendee.email],
+        fail_silently=True,
+    )
 
     return render(request, "submitted.html", context)
 
