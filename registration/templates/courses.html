@@ -2,8 +2,7 @@
 {% block navigation %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'courses' %}">Seznam kurzů</a></li>
-    <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'course' course.id %}">{{ course.course_type.title }} - {{ course.course_type.level }}</li>
+    <li class="breadcrumb-item active" aria-current="page">Seznam kurzů</li>
   </ol>
 </nav>
 {% endblock %}
