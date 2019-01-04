@@ -37,7 +37,8 @@ def courses_atom(request):
 
 
 def courses(request):
-    latest_courses_list = CourseEvent.objects.exclude(status=CourseEvent.CREATED).filter(date__gte=datetime.date.today()).order_by('date')
+
+    latest_courses_list = CourseEvent.objects.exclude(status=CourseEvent.CREATED).filter(date__gt=datetime.date.today()).order_by('date')
 
     if request.GET.get("env") == settings.TEST_KEY:
         latest_courses_list = latest_courses_list.filter(course_type__title__contains=settings.TEST_TITLE)
