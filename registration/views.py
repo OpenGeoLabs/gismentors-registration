@@ -5,17 +5,19 @@ from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.template.loader import get_template
 from django.contrib.auth.decorators import login_required
+from django.contrib.staticfiles import finders
+from django.template.defaultfilters import date as _date
 
 import datetime
 import uuid
 import tempfile
 import os
+import pathlib
 import zipfile
 from shutil import copyfile
-import pathlib
-
-from registration import utils
+import jinja2
 
 from .models import VAT
 from .models import CourseType
@@ -24,8 +26,6 @@ from .models import Attendee
 from .models import CourseAttendee
 from .models import InvoiceDetail
 from .forms import RegistrationForm
-
-from certifikat import generate_certificate
 
 
 def courses_json(request):
@@ -111,13 +111,15 @@ def _register_new_attendee(request, course_id):
     else:
         marketing = False
 
+    # Update attendee dettails, but only if submission is successfull
+    # Therefore attendee.save() is called after existing_attendees is  == 0
+    # more lower
     try:
         attendee = Attendee.objects.get(email=request.POST["email_attendee"])
         attendee.name = request.POST["name"]
         attendee.date_signed = datetime.date.today()
         attendee.marketing = marketing
         attendee.gdpr = gdpr
-        attendee.save()
     except ObjectDoesNotExist as e:
         new_attendee = Attendee.objects.create(
                 name=request.POST["name"],
@@ -145,6 +147,9 @@ def _register_new_attendee(request, course_id):
             "title": "{} - {}".format(course_event.course_type.title, level)
         }
         return render(request, "already_registered.html", context)
+    else:
+        # save attendee details only if attendee was registered
+        attendee.save()
 
     course_attendee = CourseAttendee(
             attendee=attendee,
@@ -291,11 +296,29 @@ def get_certificates_zip(course_id):
     attendees = course_event.courseattendee_set.all()
 
     temp_dir = tempfile.mkdtemp(prefix="gismentors-certificates-")
-    temp_file = "{}.zip".format(temp_dir)
+    temp_file = "{}-certifikaty.zip".format(course_event.__str2__())
     os.mkdir(os.path.join(temp_dir, "certs"))
     os.mkdir(os.path.join(temp_dir, "images"))
 
-    certificate_template = utils.get_certificate_template(course_event)
+    template = get_template("certificate.tex")
+    mydir = str(pathlib.Path(template.origin.name).parent)
+
+    latex_jinja_env = jinja2.Environment(
+        block_start_string='\BLOCK{',
+        block_end_string='}',
+        variable_start_string='\VAR{',
+        variable_end_string='}',
+        comment_start_string='\#{',
+        comment_end_string='}',
+        line_statement_prefix='%%',
+        line_comment_prefix='%#',
+        trim_blocks=True,
+        autoescape=False,
+        loader=jinja2.FileSystemLoader(mydir)
+    )
+
+    certificate_template = latex_jinja_env.get_template("certificate.tex")
+
     copyfile(
         course_event.course_type.image.path,
         os.path.join(temp_dir, course_event.course_type.image.name)
@@ -304,35 +327,39 @@ def get_certificates_zip(course_id):
     os.chdir(temp_dir)
     copyfile(course_event.course_type.image.path,
              course_event.course_type.image.name)
-    copyfile(
-                pathlib.Path(
-                    pathlib.Path(generate_certificate.__file__).parent,
-                    "images/placka-eps-converted-to.pdf"
-                ),
-                "placka-eps-converted-to.pdf"
-            )
+    copyfile(finders.find("logo-by-opengeolabs.png"),
+             "logo-by-opengeolabs.png")
+
+    content = [l.strip() for l in
+               course_event.course_type.certificate_content.split("\n")]
 
     with zipfile.ZipFile(temp_file, 'w') as myzip:
 
         myzip.write(course_event.course_type.image.name)
 
         for attendee in attendees:
-            file_name = generate_certificate.generate(
-                certificate_template,
-                attendee.attendee.name,
-                course_event.date.strftime("%d.%m.%Y"),
-                "{}-{}-{}.tex".format(
+
+            context = {
+                "name": attendee.attendee.name,
+                "logo": course_event.course_type.image.name,
+                "place": course_event.location.city,
+                "date": _date(course_event.date, "d. E Y"),
+                "content": content,
+                "lectors": [lector.name for lector in course_event.lectors.all()],
+                "materialy": course_event.course_type.materials,
+
+            }
+            file_name = "{}-{}-{}.tex".format(
                     course_event.date.strftime("%Y-%m-%d"),
                     course_event.course_type.title,
                     str(attendee.id)
-                ),
-                course_event.address.city,
-                pathlib.Path(course_event.course_type.image.path).name,
-                [l.name for l in course_event.lectors.all()]
-            )
+                )
+
+            with open(file_name, "w") as out:
+                out.write(certificate_template.render(context))
 
             myzip.write(os.path.basename(file_name))
-            myzip.write("placka-eps-converted-to.pdf")
+            myzip.write("logo-by-opengeolabs.png")
 
     return temp_file
 

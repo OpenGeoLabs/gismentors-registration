@@ -7,12 +7,11 @@ from django.http import HttpResponse
 from leaflet.admin import LeafletGeoAdmin
 
 from .models import CourseType
-from .models import Location
 from .models import CourseEvent
 from .models import InvoiceDetail
 from .models import Attendee
 from .models import CourseAttendee
-from .models import Address
+from .models import Location
 from .models import Lector
 from .views import get_certificates_zip
 
@@ -49,10 +48,6 @@ class InvoiceDateFilter(DateFilter):
             return InvoiceDetail.objects.all()
 
 
-class AddressInline(admin.StackedInline):
-    model = Address
-
-
 class CourseAttendeeInline(admin.TabularInline):
     model = CourseAttendee
     fields = ("attendee", "student", "attended", "registration_date")
@@ -61,38 +56,29 @@ class CourseAttendeeInline(admin.TabularInline):
 
 
 class LocationAdmin(LeafletGeoAdmin):
-    inlines = (AddressInline, )
     default_zoom = 7
     default_lon = 1730000
     default_lat = 6430000
 
 
 def get_certificates(modeladmin, request, queryset):
-    outzip = None
-    if len(queryset) > 1:
-        # zips = []
-        # temp_file = tempfile.mkstemp(prefix="gismentors-certificates-",
-        #                              suffix=".zip")
-        # with zipfile.ZipFile(temp_file, 'w') as myzip:
-        # for evt in queryset:
-        #     myzip.write(os.path.basename(file_name))
-
-        # myzip.write(course_event.course_type.image.name)
-        print("Not implemented")
-    else:
-        outzip = get_certificates_zip(queryset[0].id)
+    outzip = get_certificates_zip(queryset[0].id)
 
     with open(outzip, 'rb') as myzip:
         response = HttpResponse(myzip.read())
-        response['Content-Disposition'] = 'attachment; filename=certifikaty.zip'
+        response['Content-Disposition'] = \
+            'attachment; filename={}'.format(outzip)
         response['Content-Type'] = 'application/x-zip'
     return response
 
+
 get_certificates.short_description = _("Stáhnout certifikáty")
+
 
 class CourseEventAdmin(admin.ModelAdmin):
     inlines = [CourseAttendeeInline]
-    list_display = ("course_name", "level", "date", "early_date", "attendees", "days_left", "status")
+    list_display = ("course_name", "level", "date", "early_date",
+                    "attendees", "days_left", "status")
     actions = [get_certificates]
 
     list_filter = (DateFilter, )

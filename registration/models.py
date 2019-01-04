@@ -5,8 +5,6 @@ import uuid
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
-from registration import utils
-
 VAT=1.21
 
 class Lector(models.Model):
@@ -60,32 +58,9 @@ class CourseType(models.Model):
     )
 
     certificate_content = models.TextField(
-            verbose_name=_("Obsah certifikátu")
-    )
-
-    ####
-    # NOTE: choices are part of the database, you have to run 
-    # ```
-    # git submodule update certifikat
-    # ```
-    #
-    #  and
-    #
-    # ```
-    # python manage.py makemigrations --name "certificate-template-update"`
-    # python migrate
-    # ```
-    #
-    # when ever new template is added to certifikat repository
-    ####
-
-    certificate_template = models.TextField(
-        choices=utils.get_certificate_templates(),
-        verbose_name=_("Šablona certifikátu")
-    )
-
-    certificate_content = models.TextField(
-            verbose_name=_("Obsah certifikátu")
+            verbose_name=_("Obsah certifikátu"),
+            default="",
+            help_text=_("Každá položka na nový řádek"),
     )
 
     def __str__(self):
@@ -94,32 +69,23 @@ class CourseType(models.Model):
         return "{} - {}.".format(self.title, level)
 
 
-class Address(models.Model):
+class Location(models.Model):
 
     organisation = models.CharField(
+            default="",
             max_length=50)
 
     street = models.CharField(
+            default="",
             max_length=50)
 
     city = models.CharField(
+            default="",
             max_length=50)
 
     postal_code = models.CharField(
+            default="",
             max_length=10)
-
-    location = models.OneToOneField("Location",
-            on_delete=models.CASCADE
-    )
-
-    def __str__(self):
-        return "{organisation} - {city}".format(organisation=self.organisation,
-                                                city=self.city)
-
-class Location(models.Model):
-    class Meta:
-        verbose_name = _("Místo konání")
-        verbose_name_plural = _("Místa konání")
 
     coordinates = gismodels.PointField(
             verbose_name=_("Souřadnice")
@@ -130,8 +96,17 @@ class Location(models.Model):
             verbose_name=_("Poznámka")
     )
 
+    @property
+    def x(self):
+        return str(self.coordinates.x)
+
+    @property
+    def y(self):
+        return str(self.coordinates.y)
+
     def __str__(self):
-        return self.address.organisation
+        return "{organisation} - {city}".format(organisation=self.organisation,
+                                                city=self.city)
 
 
 class CourseEvent(models.Model):
@@ -181,8 +156,8 @@ class CourseEvent(models.Model):
             verbose_name=_("Včasná registrace")
     )
 
-    address = models.ForeignKey(
-            Address,
+    location = models.ForeignKey(
+            Location,
             on_delete=models.CASCADE,
             verbose_name=_("Místo konání")
     )
@@ -239,6 +214,9 @@ class CourseEvent(models.Model):
             "date": self.date,
             "level": self.course_type.level
         }
+
+    def __str2__(self):
+        return "{}-{}".format(self.course_type.title, self.date)
 
     def __str__(self):
         return "{} ({})".format(
@@ -411,10 +389,6 @@ class CourseAttendee(models.Model):
     next_topics = models.TextField(
             blank=True,
             verbose_name=_("Témata dalších kurzu"))
-
-    certificate = models.FileField(
-            blank=True,
-            verbose_name=_("Certifikát"))
 
     token = models.CharField(
         max_length=255,

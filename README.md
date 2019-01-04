@@ -16,8 +16,6 @@ pip install -r requirements.txt
 ```
 django-admin startproject gismentors
 git clone https://github.com/opengeolabs/gismentors-registration.git registration
-git submodule init
-git submodule update
 ```
 
 Now you have to adjust the `settings.py` file
