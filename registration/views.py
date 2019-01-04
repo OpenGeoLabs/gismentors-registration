@@ -172,6 +172,16 @@ def _register_new_attendee(request, course_id):
     except ObjectDoesNotExist as e:
         attendee = _create_new_attende(name, email, gdpr, marketing)
 
+    amount = 0
+
+    if datetime.date.today() <= course_event.early_date:
+        if student:
+            amount = course_event.price_student
+        else:
+            amount = course_event.price_regular
+    else:
+        amount = course_event.price_late
+
     course_attendee = CourseAttendee(
             attendee=attendee,
             course=course_event,
@@ -182,18 +192,11 @@ def _register_new_attendee(request, course_id):
             topics=request.POST["topics"],
             next_topics=request.POST["next_topics"],
             attended=False,
+            amount=amount,
             token=uuid.uuid1()
     )
 
     attendee.courses.add(course_event)
-
-    if course_attendee.registration_date <= course_event.early_date:
-        if course_attendee.student:
-            amount = course_event.price_student
-        else:
-            amount = course_event.price_regular
-    else:
-        amount = course_event.price_late
 
     invoice_text = "{} - {} {}".format(course_event.course_type.title,
                                        level, course_event.date)
@@ -205,18 +208,24 @@ def _register_new_attendee(request, course_id):
     if not invoicemail:
         invoicemail = request.POST["email_attendee"]
 
-    invoice_detail = InvoiceDetail(
-        address="{street}\n{zipcode} - {city}".format(
-            street=request.POST["street"], zipcode=request.POST["zip_code"],
-            city=request.POST["city"]),
-        name=organisation,
-        ico=request.POST["ico"],
-        dic=request.POST["dic"],
-        objednavka=request.POST["order"],
-        amount=amount,
-        text=invoice_text,
-        email=invoicemail
-    )
+    try:
+        invoice_detail = InvoiceDetail.objects.get(
+            order=request.POST["order"],
+            name=organisation
+        )
+    except ObjectDoesNotExist as e:
+        invoice_detail = InvoiceDetail(
+            address="{street}\n{zipcode} - {city}".format(
+                street=request.POST["street"],
+                zipcode=request.POST["zip_code"],
+                city=request.POST["city"]),
+            name=organisation,
+            ico=request.POST["ico"],
+            dic=request.POST["dic"],
+            order=request.POST["order"],
+            text=invoice_text,
+            email=invoicemail
+        )
 
     invoice_detail.save()
     course_attendee.invoice_detail = invoice_detail

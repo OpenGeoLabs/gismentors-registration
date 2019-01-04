@@ -52,9 +52,13 @@ class InvoiceDateFilter(DateFilter):
 
 class CourseAttendeeInline(admin.TabularInline):
     model = CourseAttendee
-    fields = ("attendee", "student", "attended", "registration_date")
-    readonly_fields = ("attendee", "registration_date", )
+
+    fields = ("attendee", "student", "attended", "registration_date",
+              "amount", "note")
+    readonly_fields = ("attendee", "registration_date", "note")
+    raw_id_fields = ("invoice_detail",)
     extra = 0
+
 
 
 class LocationAdmin(LeafletGeoAdmin):
@@ -82,10 +86,14 @@ get_certificates.short_description = _("Stáhnout certifikáty")
 class CourseEventAdmin(admin.ModelAdmin):
     inlines = [CourseAttendeeInline]
     list_display = ("course_name", "level", "date", "early_date",
-                    "attendees", "days_left", "status")
+                    "attendees", "days_left", "status", "amount")
     actions = [get_certificates]
 
     list_filter = (DateFilter, )
+
+    def amount(self, ce):
+        attendees = CourseAttendee.objects.filter(course=ce)
+        return sum(att.amount for att in attendees)
 
     def course_name(self, ce):
         return ce.course_type.title
@@ -129,7 +137,9 @@ class CourseAttendeeAdmin(admin.ModelAdmin):
     list_display = ("attendee_name", "attendee_email", "organisation", "student", "course_id",
                     "attended")
 
-    list_filter = ("course", )
+    search_fields = ("attendee__name", "attendee__email", "invoice_detail__name")
+    list_filter = ("student", )
+    raw_id_fields = ("invoice_detail",)
     list_editable = ('attended',)
 
     def attendee_name(self, ca):
@@ -152,10 +162,11 @@ class CourseAttendeeAdmin(admin.ModelAdmin):
 
 class InvoiceDetailAdmin(admin.ModelAdmin):
     list_display = ("organisation", "course_id", "amount", "address", "ico",
-                    "dic", "objednavka", "email", "note")
+                    "dic", "order", "email", "note")
+    search_fields = ("name", "order", "email", "ico")
 
     inlines = (CourseAttendeeInline, )
-    list_filter = (InvoiceDateFilter, )
+    list_filter = (InvoiceDateFilter, "order")
 
     def organisation(self, invoice_detail):
         return invoice_detail.name
@@ -164,18 +175,24 @@ class InvoiceDetailAdmin(admin.ModelAdmin):
         return invoice_detail.invoice
 
     def course_id(self, invoice_detail):
-        course_attendee = CourseAttendee.objects.get(invoice_detail=invoice_detail)
+        course_attendees = CourseAttendee.objects.filter(invoice_detail=invoice_detail)
 
-        course_date = course_attendee.course.date
-        course_name = course_attendee.course.course_type.title
-        course_level = course_attendee.course.course_type.level_choices[
-                       course_attendee.course.course_type.level][1]
+        if len(course_attendees) > 0:
+            course_date = course_attendees[0].course.date
+            course_name = course_attendees[0].course.course_type.title
+            course_level = course_attendees[0].course.course_type.level_choices[
+                        course_attendees[0].course.course_type.level][1]
 
-        return "{} - {} {}".format(course_name, course_level, course_date)
+            return "{} - {} {}".format(course_name, course_level, course_date)
+        else:
+            return "No attendee"
+
 
     def note(self, invoice_detail):
-        course_attendee = CourseAttendee.objects.get(invoice_detail=invoice_detail)
-        return course_attendee.note
+        course_attendees = CourseAttendee.objects.filter(invoice_detail=invoice_detail)
+        notes = ""
+        notes = "\n".join([ca.note for ca in course_attendees])
+        return notes
 
 
 admin.site.register(Lector)

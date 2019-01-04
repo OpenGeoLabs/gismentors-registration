@@ -255,7 +255,7 @@ class InvoiceDetail(models.Model):
             max_length=16,
             verbose_name=_("DIČ"))
 
-    objednavka = models.CharField(
+    order = models.CharField(
             null=True,
             blank=True,
             max_length=16,
@@ -264,15 +264,22 @@ class InvoiceDetail(models.Model):
     email = models.EmailField(
             verbose_name=_("Kontaktní e-mail"))
 
-    amount = models.IntegerField(
-            verbose_name=_("Částka"), help_text="Částka bez DPH")
-
     invoice = models.FileField(
             blank=True,
             verbose_name=_("Faktura"))
 
     text = models.TextField(
             verbose_name=_("Obsah"))
+
+    @property
+    def amount(self):
+        """Count sum of all course_attendees
+        """
+
+        attendees = CourseAttendee.objects.filter(invoice_detail=self)
+        amount = sum([att.amount for att in attendees])
+
+        return amount
 
     def __str__(self):
         if self.name == None:
@@ -403,6 +410,10 @@ class CourseAttendee(models.Model):
     invoice_detail = models.ForeignKey(
         "InvoiceDetail",
         on_delete=models.PROTECT)
+
+    amount = models.IntegerField(
+            verbose_name=_("Částka"),
+            help_text="Částka bez DPH")
 
     attended = models.BooleanField(default=False)
 
