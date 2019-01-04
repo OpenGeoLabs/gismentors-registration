@@ -1,6 +1,6 @@
 # GISMentors Django registration app
 
-This is the Django-based application for registering new attendees to GISmentors
+This is the Django-based application for registering new attendees to GISMentors
 workshops and courses.
 
 ## Dependenices
@@ -25,6 +25,7 @@ Now you have to adjust the `settings.py` file
 3. Add `django.contrib.gis` to `INSTALLED_APPS`
 4. Adjust database engine for support of spatial models https://docs.djangoproject.com/en/1.11/ref/contrib/gis/tutorial/#configure-settings-py
 5. If using `spatialite`, use `SPATIALITE_LIBRARY_PATH` settings option
+6. Set `TEST_MAIL`, `TEST_TITLE` and `TEST_KEY` variables
 
 In `settings.py`:
 
@@ -46,7 +47,7 @@ INSTALLED_APPS = [
 
 ...
 
-SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
+SPATIALITE_LIBRARY_PATH = '/usr/lib/x86_64-linux-gnu/mod_spatialite.so'
 
 DATABASES = {
     'default': {
@@ -65,10 +66,15 @@ STATICFILES_DIRS = [
 ...
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASEDIR, "media")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 ```
 
+```
+TEST_MAIL = 'madlen.testing@gmail.com'
+TEST_KEY = '831239ad-3b93-4624-9529-6bc67970f541'
+TEST_TITLE = 'Testing'
+```
 
 Do further settings modifications.
 

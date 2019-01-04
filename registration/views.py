@@ -37,7 +37,14 @@ def courses_atom(request):
 
 
 def courses(request):
+
     latest_courses_list = CourseEvent.objects.exclude(status=CourseEvent.CREATED).filter(date__gt=datetime.date.today()).order_by('date')
+
+    if request.GET.get("env") == settings.TEST_KEY:
+        latest_courses_list = latest_courses_list.filter(course_type__title__contains=settings.TEST_TITLE)
+    else:
+        latest_courses_list = latest_courses_list.exclude(course_type__title__contains=settings.TEST_TITLE)
+
     context = {
         'latest_courses_list': latest_courses_list,
         "level_choices": CourseType.level_choices
@@ -48,10 +55,16 @@ def courses(request):
 def _empty_form(request, course_id):
 
     course = get_object_or_404(CourseEvent, pk=course_id)
+    test_env = False
+
+    if request.GET.get("env") == settings.TEST_KEY:
+        test_env = settings.TEST_KEY
+
     context = {
         "course": course,
         "level": course.course_type.level_choices[course.course_type.level][1],
-        "form": RegistrationForm()
+        "form": RegistrationForm(),
+        "test_env": test_env
     }
 
     return render(request, "course-forms.html", context)
@@ -60,6 +73,7 @@ def _empty_form(request, course_id):
 def _register_new_attendee(request, course_id):
 
     form = RegistrationForm(request.POST)
+    is_test = (request.GET.get("env") == settings.TEST_KEY)
 
     # Validate the form: the captcha field will automatically
     # check the input
@@ -185,29 +199,57 @@ def _register_new_attendee(request, course_id):
 
     suma = sum([int(attendee.invoice_detail.amount) for attendee in course_event.courseattendee_set.all()])
 
-    send_mail(
-        '[GISMentors-kurzy] {} - {} {}'.format(
-            course_event.course_type.title, level, course_event.date
-        ),
-        """
-        Kurz: {}
-        Účastník: {}
-        E-mail: {}
-        Organizace: {}
-        Celkem registrovaných účastníků: {}
-        Celkem peněz (bez DPH): {}
-        """.format(
-            course_event.course_type.title,
-            attendee.name,
-            attendee.email,
-            request.POST["organisation"],
-            len(course_event.courseattendee_set.all()),
-            suma
-        ),
-        'info@gismentors.cz',
-        [settings.INFO_MAIL],
-        fail_silently=True,
-    )
+    if is_test:
+
+        send_mail(
+            '[GISMentors-kurzy] {} - {} {}'.format(
+                course_event.course_type.title, level, course_event.date
+            ),
+            """
+            Kurz: {}
+            Účastník: {}
+            E-mail: {}
+            Organizace: {}
+            Celkem registrovaných účastníků: {}
+            Celkem peněz (bez DPH): {}
+            """.format(
+                course_event.course_type.title,
+                attendee.name,
+                attendee.email,
+                request.POST["organisation"],
+                len(course_event.courseattendee_set.all()),
+                suma
+            ),
+            'info@gismentors.cz',
+            [settings.TEST_MAIL],
+            fail_silently=True,
+        )
+
+    else:
+
+        send_mail(
+            '[GISMentors-kurzy] {} - {} {}'.format(
+                course_event.course_type.title, level, course_event.date
+            ),
+            """
+            Kurz: {}
+            Účastník: {}
+            E-mail: {}
+            Organizace: {}
+            Celkem registrovaných účastníků: {}
+            Celkem peněz (bez DPH): {}
+            """.format(
+                course_event.course_type.title,
+                attendee.name,
+                attendee.email,
+                request.POST["organisation"],
+                len(course_event.courseattendee_set.all()),
+                suma
+            ),
+            'info@gismentors.cz',
+            [settings.INFO_MAIL],
+            fail_silently=True,
+        )
 
     send_mail(
         '[GISMentors-kurzy] Potvrzení přihlášky',
