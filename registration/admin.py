@@ -3,10 +3,13 @@ import datetime
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.query import QuerySet
 from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Fill, Border, Font
 
 from leaflet.admin import LeafletGeoAdmin
 import os
 import shutil
+import tempfile
 
 from .models import CourseType
 from .models import CourseEvent
@@ -80,14 +83,60 @@ def get_certificates(modeladmin, request, queryset):
     return response
 
 
+def get_invoices(modeladmin, request, queryset):
+    course_event = queryset[0]
+    attendees = CourseAttendee.objects.filter(course=course_event)
+    invoices = InvoiceDetail.objects.filter(courseattendee__in=attendees).distinct()
+    file_name = "{}-{}.xlsx".format(course_event.course_type.title,
+                                    course_event.date)
+
+    wb = Workbook()
+    ws = wb["Sheet"]
+    ws.append([
+        "id", "částka (bez DPH)", "organizace", "adresa", "IČ", "DIČ",
+        "objednavka", "kontaktni email", "text faktury", "seznam účastníků"
+    ])
+    for invoice in invoices:
+        row = [
+            invoice.pk,
+            invoice.amount,
+            invoice.name,
+            invoice.address,
+            invoice.ico,
+            invoice.dic,
+            invoice.order,
+            invoice.email,
+            invoice.text,
+            ", ".join([ca.attendee.name for ca in
+                       CourseAttendee.objects.filter(invoice_detail=invoice)]),
+        ]
+        ws.append(row)
+
+    def set_font(c):
+        ws[c+"1"].font = Font(bold=True,)
+        return True
+    list(map(set_font, ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]))
+    tmp_file_name = tempfile.mktemp(prefix="gismentors-registrace-faktury-")
+    wb.save(tmp_file_name)
+
+    with open(tmp_file_name, 'rb') as mywb:
+        response = HttpResponse(mywb.read())
+        response['Content-Disposition'] = \
+            'attachment; filename={}'.format(file_name)
+        response['Content-Type'] = wb.mime_type
+    os.remove(tmp_file_name)
+    return response
+
+
 get_certificates.short_description = _("Stáhnout certifikáty")
+get_invoices.short_description = _("Stáhnout XLSX pro faktury")
 
 
 class CourseEventAdmin(admin.ModelAdmin):
     inlines = [CourseAttendeeInline]
     list_display = ("course_name", "level", "date", "early_date",
                     "attendees", "days_left", "status", "amount")
-    actions = [get_certificates]
+    actions = [get_certificates, get_invoices]
 
     list_filter = (DateFilter, )
 
