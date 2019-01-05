@@ -5,6 +5,8 @@ from django.db.models.query import QuerySet
 from django.http import HttpResponse
 
 from leaflet.admin import LeafletGeoAdmin
+import os
+import shutil
 
 from .models import CourseType
 from .models import CourseEvent
@@ -62,13 +64,15 @@ class LocationAdmin(LeafletGeoAdmin):
 
 
 def get_certificates(modeladmin, request, queryset):
-    outzip = get_certificates_zip(queryset[0].id)
+    (outzip, tempdir) = get_certificates_zip(queryset[0].id)
 
     with open(outzip, 'rb') as myzip:
         response = HttpResponse(myzip.read())
         response['Content-Disposition'] = \
             'attachment; filename={}'.format(outzip)
         response['Content-Type'] = 'application/x-zip'
+    os.remove(outzip)
+    shutil.rmtree(tempdir)
     return response
 
 

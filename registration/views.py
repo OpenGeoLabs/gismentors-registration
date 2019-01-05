@@ -361,7 +361,7 @@ def get_certificates_zip(course_id):
             myzip.write(os.path.basename(file_name))
             myzip.write("logo-by-opengeolabs.png")
 
-    return temp_file
+    return (temp_file, temp_dir)
 
 
 @login_required(login_url='/admin/login/')
