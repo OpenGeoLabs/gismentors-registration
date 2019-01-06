@@ -373,6 +373,7 @@ def get_certificates_zip(course_id):
 
             context = {
                 "name": attendee.attendee.name,
+                "course_title": course_event.course_type.long_str,
                 "logo": course_event.course_type.image.name,
                 "place": course_event.location.city,
                 "date": _date(course_event.date, "d. E Y"),
@@ -391,7 +392,7 @@ def get_certificates_zip(course_id):
                 out.write(certificate_template.render(context))
 
             myzip.write(os.path.basename(file_name))
-            myzip.write("logo-by-opengeolabs.png")
+        myzip.write("logo-by-opengeolabs.png")
 
     return (temp_file, temp_dir)
 

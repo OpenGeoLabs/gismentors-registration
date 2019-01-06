@@ -63,6 +63,12 @@ class CourseType(models.Model):
             help_text=_("Každá položka na nový řádek"),
     )
 
+    @property
+    def long_str(self):
+
+        level = dict(self.level_choices)[self.level]
+        return "{} - {}".format(self.title, level)
+
     def __str__(self):
 
         level = dict(self.level_choices)[self.level][0:3]
