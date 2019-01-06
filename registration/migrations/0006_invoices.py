@@ -3,6 +3,15 @@
 from django.db import migrations, models
 
 
+def invoice2attendee(apps, schema_editor):
+    """Set `amount` value from invoice_detail to course_attendee
+    """
+    CourseAttendee = apps.get_model("registration", "CourseAttendee")
+    for ca in CourseAttendee.objects.all():
+        ca.amount = ca.invoice_detail.amount
+        ca.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -15,14 +24,16 @@ class Migration(migrations.Migration):
             old_name='objednavka',
             new_name='order',
         ),
-        migrations.RemoveField(
-            model_name='invoicedetail',
-            name='amount',
-        ),
         migrations.AddField(
             model_name='courseattendee',
             name='amount',
-            field=models.IntegerField(default=0, help_text='Částka bez DPH', verbose_name='Částka'),
+            field=models.IntegerField(default=0, help_text='Částka bez DPH',
+                                      verbose_name='Částka'),
             preserve_default=False,
+        ),
+        migrations.RunPython(invoice2attendee),
+        migrations.RemoveField(
+            model_name='invoicedetail',
+            name='amount',
         ),
     ]

@@ -208,12 +208,17 @@ def _register_new_attendee(request, course_id):
     if not invoicemail:
         invoicemail = request.POST["email_attendee"]
 
-    try:
-        invoice_detail = InvoiceDetail.objects.get(
-            order=request.POST["order"],
+    order = request.POST["order"]
+    invoice_detail = None
+    if order:
+        invoice_details = InvoiceDetail.objects.filter(
+            order=order,
             name=organisation
         )
-    except ObjectDoesNotExist as e:
+        if len(invoice_details) > 0:
+            invoice_detail = invoice_details[0]
+
+    if not invoice_detail:
         invoice_detail = InvoiceDetail(
             address="{street}\n{zipcode} - {city}".format(
                 street=request.POST["street"],
