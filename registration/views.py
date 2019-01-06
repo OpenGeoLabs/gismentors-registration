@@ -80,7 +80,43 @@ def _empty_form(request, course_id):
     return render(request, "course-forms.html", context)
 
 
+def _create_new_attende(name, email, gdpr, marketing):
+    """Register new generic attendee
+
+    :return: new_attendee
+    """
+
+    new_attendee = Attendee.objects.create(
+            name=name,
+            email=email,
+            gdpr=gdpr,
+            marketing=marketing,
+            token=uuid.uuid1(),
+            date_signed=datetime.date.today()
+    )
+    new_attendee.save()
+    return new_attendee
+
+
+def _update_attendee_by_email(email, marketing, gdpr, name=None):
+    """Update attendee marketing information and GDPR of user identified by
+    e-mail
+    """
+
+    attendee = Attendee.objects.get(email=email)
+    attendee.date_signed = datetime.date.today()
+    attendee.marketing = marketing
+    attendee.gdpr = gdpr
+    if name:
+        attendee.name = name
+    attendee.save()
+
+    return attendee
+
+
 def _register_new_attendee(request, course_id):
+    """Register new attendee person in our database
+    """
 
     form = RegistrationForm(request.POST)
     is_test = (request.GET.get("env") == settings.TEST_KEY)
@@ -88,48 +124,28 @@ def _register_new_attendee(request, course_id):
     # Validate the form: the captcha field will automatically
     # check the input
     if not form.is_valid():
-        # return defaults.bad_request(request, SuspiciousOperation("Form not valid"))
+        # return defaults.bad_request(request,
+        # SuspiciousOperation("Form not valid"))
         pass
 
+    name = request.POST["name"]
+    email = request.POST["email_attendee"]
     attendee = None
     course_attendee = None
     course_event = get_object_or_404(CourseEvent, pk=course_id)
+    gdpr = False
+    marketing = False
+    student = False
+    amount = 0
 
     level = list(filter(lambda c: c[0] == course_event.course_type.level,
                  CourseType.level_choices))[0][1]
 
-
-
     if "gdpr" in request.POST and request.POST["gdpr"] == "on":
         gdpr = True
-    else:
-        pass
-        # return defaults.bad_request(request, ValidationError("GDPR musí být potvrzeno"))
 
     if "marketing" in request.POST and request.POST["marketing"] == "on":
         marketing = True
-    else:
-        marketing = False
-
-    # Update attendee dettails, but only if submission is successfull
-    # Therefore attendee.save() is called after existing_attendees is  == 0
-    # more lower
-    try:
-        attendee = Attendee.objects.get(email=request.POST["email_attendee"])
-        attendee.name = request.POST["name"]
-        attendee.date_signed = datetime.date.today()
-        attendee.marketing = marketing
-        attendee.gdpr = gdpr
-    except ObjectDoesNotExist as e:
-        new_attendee = Attendee.objects.create(
-                name=request.POST["name"],
-                email=request.POST["email_attendee"],
-                gdpr=gdpr,
-                marketing=marketing,
-                token=uuid.uuid1(),
-                date_signed=datetime.date.today())
-        new_attendee.save()
-        attendee = new_attendee
 
     if "student" in request.POST and request.POST["student"] == "on":
         student = True
@@ -137,19 +153,25 @@ def _register_new_attendee(request, course_id):
         student = False
 
     existing_attendees = course_event.courseattendee_set.filter(
-        attendee__name=attendee.name,
-        attendee__email=attendee.email)
+        attendee__name=name,
+        attendee__email=email
+    )
 
     if len(existing_attendees) > 0:
         context = {
             "name": existing_attendees[0].attendee.name,
-            "email": attendee.email,
+            "email": existing_attendees[0].attendee.email,
             "title": "{} - {}".format(course_event.course_type.title, level)
         }
         return render(request, "already_registered.html", context)
-    else:
-        # save attendee details only if attendee was registered
-        attendee.save()
+
+    # save attendee details only if attendee was registered
+    attendee = None
+    try:
+        attendee = Attendee.objects.get(email=email)
+        _update_attendee_by_email(email, marketing, gdpr, name)
+    except ObjectDoesNotExist as e:
+        attendee = _create_new_attende(name, email, gdpr, marketing)
 
     course_attendee = CourseAttendee(
             attendee=attendee,
@@ -165,9 +187,7 @@ def _register_new_attendee(request, course_id):
     )
 
     attendee.courses.add(course_event)
-    attendee.save()
 
-    amount = 0
     if course_attendee.registration_date <= course_event.early_date:
         if course_attendee.student:
             amount = course_event.price_student
@@ -177,11 +197,11 @@ def _register_new_attendee(request, course_id):
         amount = course_event.price_late
 
     invoice_text = "{} - {} {}".format(course_event.course_type.title,
-                                    level, course_event.date)
+                                       level, course_event.date)
 
-    name = request.POST["organisation"]
-    if not name:
-        name = attendee.name
+    organisation = request.POST["organisation"]
+    if not organisation:
+        organisation = attendee.name
     invoicemail = request.POST["invoicemail"]
     if not invoicemail:
         invoicemail = request.POST["email_attendee"]
@@ -190,7 +210,7 @@ def _register_new_attendee(request, course_id):
         address="{street}\n{zipcode} - {city}".format(
             street=request.POST["street"], zipcode=request.POST["zip_code"],
             city=request.POST["city"]),
-        name=name,
+        name=organisation,
         ico=request.POST["ico"],
         dic=request.POST["dic"],
         objednavka=request.POST["order"],
@@ -203,22 +223,35 @@ def _register_new_attendee(request, course_id):
     course_attendee.invoice_detail = invoice_detail
     course_attendee.save()
 
+    _send_mails(course_event, attendee, level, organisation, amount, is_test)
+
     context = {
-            "course_name": "{} - {}".format(course_event.course_type.title,
-                                            level),
-            "course_date": course_event.date,
-            "attendee": attendee.name,
-            "mail": attendee.email,
-            "course_id": course_event.id
+        "course_name": "{} - {}".format(course_event.course_type.title, level),
+        "course_date": course_event.date,
+        "attendee": attendee.name,
+        "mail": attendee.email,
+        "course_id": course_event.id
     }
 
-    suma = sum([int(attendee.invoice_detail.amount) for attendee in course_event.courseattendee_set.all()])
+    return render(request, "submitted.html", context)
+
+
+def _send_mails(course_event, attendee, level,
+                organisation, amount, is_test=False):
+    """Send e-mails to info at gismentors and to new course attendee
+    """
+
+    suma = sum([
+        int(attendee.invoice_detail.amount) for attendee in
+        course_event.courseattendee_set.all()
+    ])
 
     if is_test:
 
         send_mail(
             '[GISMentors-kurzy] {} - {} {}'.format(
-                course_event.course_type.title, level, course_event.date
+                course_event.course_type.title,
+                level, course_event.date
             ),
             """
             Kurz: {}
@@ -231,7 +264,7 @@ def _register_new_attendee(request, course_id):
                 course_event.course_type.title,
                 attendee.name,
                 attendee.email,
-                request.POST["organisation"],
+                organisation,
                 len(course_event.courseattendee_set.all()),
                 suma
             ),
@@ -257,7 +290,7 @@ def _register_new_attendee(request, course_id):
                 course_event.course_type.title,
                 attendee.name,
                 attendee.email,
-                request.POST["organisation"],
+                organisation,
                 len(course_event.courseattendee_set.all()),
                 suma
             ),
@@ -279,8 +312,6 @@ def _register_new_attendee(request, course_id):
         fail_silently=True,
     )
 
-    return render(request, "submitted.html", context)
-
 
 def course(request, course_id):
 
@@ -288,6 +319,7 @@ def course(request, course_id):
         return _register_new_attendee(request, course_id)
     else:
         return _empty_form(request, course_id)
+
 
 def get_certificates_zip(course_id):
 
