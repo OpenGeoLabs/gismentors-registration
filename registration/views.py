@@ -217,6 +217,7 @@ def _register_new_attendee(request, course_id):
         )
         if len(invoice_details) > 0:
             invoice_detail = invoice_details[0]
+        invoice_detail.text += "\n" + invoice_text
 
     if not invoice_detail:
         invoice_detail = InvoiceDetail(
