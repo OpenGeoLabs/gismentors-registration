@@ -77,6 +77,10 @@ class CourseType(models.Model):
 
 class Location(models.Model):
 
+    class Meta:
+        verbose_name = _("Místo konání")
+        verbose_name_plural = _("Místa konání")
+
     organisation = models.CharField(
             default="",
             max_length=50)
@@ -268,9 +272,6 @@ class InvoiceDetail(models.Model):
             blank=True,
             verbose_name=_("Faktura"))
 
-    text = models.TextField(
-            verbose_name=_("Obsah"))
-
     @property
     def amount(self):
         """Count sum of all course_attendees
@@ -281,8 +282,20 @@ class InvoiceDetail(models.Model):
 
         return amount
 
+    @property
+    def text(self):
+        """Get list of all courses
+        """
+
+        # invoice_text = "{} - {} {}".format(course_event.course_type.title,
+        #                                level, course_event.date)
+        attendees = CourseAttendee.objects.filter(invoice_detail=self)
+        courses = set(str(att.course.course_type.long_str) for att in
+                      attendees)
+        return ", ".join(courses)
+
     def __str__(self):
-        if self.name == None:
+        if self.name is None:
             str(self.id)
         else:
             return self.name
@@ -375,6 +388,7 @@ class CourseAttendee(models.Model):
 
     course = models.ForeignKey(
             CourseEvent,
+            verbose_name=_("Kurz"),
             on_delete=models.PROTECT)
 
     student = models.BooleanField(

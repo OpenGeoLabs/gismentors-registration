@@ -198,9 +198,6 @@ def _register_new_attendee(request, course_id):
 
     attendee.courses.add(course_event)
 
-    invoice_text = "{} - {} {}".format(course_event.course_type.title,
-                                       level, course_event.date)
-
     organisation = request.POST["organisation"]
     if not organisation:
         organisation = attendee.name
@@ -217,7 +214,6 @@ def _register_new_attendee(request, course_id):
         )
         if len(invoice_details) > 0:
             invoice_detail = invoice_details[0]
-        invoice_detail.text += "\n" + invoice_text
 
     if not invoice_detail:
         invoice_detail = InvoiceDetail(

@@ -48,7 +48,7 @@ class InvoiceDateFilter(DateFilter):
         if val:
             course_event = CourseEvent.objects.get(pk=val)
             return InvoiceDetail.objects.filter(
-                courseattendee__course=course_event)
+                courseattendee__course=course_event).distinct()
         else:
             return InvoiceDetail.objects.all()
 
@@ -57,8 +57,8 @@ class CourseAttendeeInline(admin.TabularInline):
     model = CourseAttendee
 
     fields = ("attendee", "student", "attended", "registration_date",
-              "amount", "note")
-    readonly_fields = ("attendee", "registration_date", "note")
+              "amount", "note", "course")
+    readonly_fields = ("attendee", "registration_date", "note", "course")
     raw_id_fields = ("invoice_detail",)
     extra = 0
 
@@ -187,7 +187,7 @@ class CourseAttendeeAdmin(admin.ModelAdmin):
                     "attended")
 
     search_fields = ("attendee__name", "attendee__email", "invoice_detail__name")
-    list_filter = ("student", )
+    list_filter = ("student", "course", "invoice_detail__name")
     raw_id_fields = ("invoice_detail",)
     list_editable = ('attended',)
 
@@ -215,7 +215,9 @@ class InvoiceDetailAdmin(admin.ModelAdmin):
     search_fields = ("name", "order", "email", "ico")
 
     inlines = (CourseAttendeeInline, )
-    list_filter = (InvoiceDateFilter, "order")
+    list_filter = (InvoiceDateFilter, "order", "name" )
+
+    readonly_fields = ("amount", "text", )
 
     def organisation(self, invoice_detail):
         return invoice_detail.name
