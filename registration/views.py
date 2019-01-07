@@ -153,7 +153,6 @@ def _register_new_attendee(request, course_id):
         student = False
 
     existing_attendees = course_event.courseattendee_set.filter(
-        attendee__name=name,
         attendee__email=email
     )
 
