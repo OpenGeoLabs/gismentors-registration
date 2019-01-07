@@ -2,16 +2,21 @@ from django.contrib import admin
 import datetime
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.query import QuerySet
+from django.http import HttpResponse
 
 from leaflet.admin import LeafletGeoAdmin
+import os
+import shutil
 
 from .models import CourseType
-from .models import Location
 from .models import CourseEvent
 from .models import InvoiceDetail
 from .models import Attendee
 from .models import CourseAttendee
-from .models import Address
+from .models import Location
+from .models import Lector
+from .views import get_certificates_zip
+
 
 class DateFilter(admin.SimpleListFilter):
     """Filter for admin interface of NUTS3 regions (Kraje)
@@ -45,10 +50,6 @@ class InvoiceDateFilter(DateFilter):
             return InvoiceDetail.objects.all()
 
 
-class AddressInline(admin.StackedInline):
-    model = Address
-
-
 class CourseAttendeeInline(admin.TabularInline):
     model = CourseAttendee
     fields = ("attendee", "student", "attended", "registration_date")
@@ -57,15 +58,32 @@ class CourseAttendeeInline(admin.TabularInline):
 
 
 class LocationAdmin(LeafletGeoAdmin):
-    inlines = (AddressInline, )
     default_zoom = 7
     default_lon = 1730000
     default_lat = 6430000
 
 
+def get_certificates(modeladmin, request, queryset):
+    (outzip, tempdir) = get_certificates_zip(queryset[0].id)
+
+    with open(outzip, 'rb') as myzip:
+        response = HttpResponse(myzip.read())
+        response['Content-Disposition'] = \
+            'attachment; filename={}'.format(outzip)
+        response['Content-Type'] = 'application/x-zip'
+    os.remove(outzip)
+    shutil.rmtree(tempdir)
+    return response
+
+
+get_certificates.short_description = _("Stáhnout certifikáty")
+
+
 class CourseEventAdmin(admin.ModelAdmin):
     inlines = [CourseAttendeeInline]
-    list_display = ("course_name", "level", "date", "early_date", "attendees", "days_left", "status")
+    list_display = ("course_name", "level", "date", "early_date",
+                    "attendees", "days_left", "status")
+    actions = [get_certificates]
 
     list_filter = (DateFilter, )
 
@@ -160,6 +178,7 @@ class InvoiceDetailAdmin(admin.ModelAdmin):
         return course_attendee.note
 
 
+admin.site.register(Lector)
 admin.site.register(CourseType)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(CourseEvent, CourseEventAdmin)

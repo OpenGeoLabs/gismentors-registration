@@ -1,0 +1,52 @@
+\documentclass[12pt, a4paper]{letter}
+\usepackage{graphicx}
+\usepackage[czech]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{a4wide}
+
+\begin{document}
+\pagestyle{empty}
+\begin{center}
+
+{\Large GISMentors}
+
+{\Huge Osvědčení}
+
+{\Large \VAR{name} }
+
+    úspěšně absolvoval(a)
+
+    \includegraphics[width=0.30\textwidth]{\VAR{logo}}
+
+{\Large \VAR{course_title} }
+
+    \VAR{place} dne \VAR{date}
+\end{center}
+
+Náplň školení:
+
+\begin{itemize}
+    \BLOCK{ for item in content }
+    \item \VAR{ item }
+    \BLOCK{ endfor }
+\end{itemize}
+
+\vfill
+\parbox{7cm}{
+        Školitelé: \\
+
+        \BLOCK{ for lector in lectors }
+        \VAR{lector} \\
+        \BLOCK{ endfor }
+}
+\hfill
+\parbox{3cm}{
+        \includegraphics[width=3cm]{logo-by-opengeolabs.png}
+}
+
+
+\begin{center}
+{\footnotesize Obsah školení je dostupný na adrese \VAR{materialy} }
+\end{center}
+
+\end{document}

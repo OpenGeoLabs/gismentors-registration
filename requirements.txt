@@ -1,3 +1,4 @@
 django
 django-leaflet
 django-simple-captcha
+jinja2

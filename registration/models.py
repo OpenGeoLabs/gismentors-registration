@@ -5,8 +5,20 @@ import uuid
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
-
 VAT=1.21
+
+class Lector(models.Model):
+    class Meta:
+        verbose_name = _("Školitel")
+        verbose_name_plural = _("Školitelé")
+
+    name = models.CharField(
+        max_length=256,
+        verbose_name=_("Lector name")
+    )
+
+    def __str__(self):
+        return self.name
 
 class CourseType(models.Model):
     class Meta:
@@ -45,34 +57,41 @@ class CourseType(models.Model):
             verbose_name=_("Rozvrh")
     )
 
+    certificate_content = models.TextField(
+            verbose_name=_("Obsah certifikátu"),
+            default="",
+            help_text=_("Každá položka na nový řádek"),
+    )
+
+    @property
+    def long_str(self):
+
+        level = dict(self.level_choices)[self.level]
+        return "{} - {}".format(self.title, level)
+
     def __str__(self):
 
         level = dict(self.level_choices)[self.level][0:3]
         return "{} - {}.".format(self.title, level)
 
 
-class Address(models.Model):
+class Location(models.Model):
 
     organisation = models.CharField(
+            default="",
             max_length=50)
 
     street = models.CharField(
+            default="",
             max_length=50)
 
     city = models.CharField(
+            default="",
             max_length=50)
 
     postal_code = models.CharField(
+            default="",
             max_length=10)
-
-    location = models.OneToOneField("Location",
-            on_delete=models.CASCADE
-            )
-
-class Location(models.Model):
-    class Meta:
-        verbose_name = _("Místo konání")
-        verbose_name_plural = _("Místa konání")
 
     coordinates = gismodels.PointField(
             verbose_name=_("Souřadnice")
@@ -83,8 +102,17 @@ class Location(models.Model):
             verbose_name=_("Poznámka")
     )
 
+    @property
+    def x(self):
+        return str(self.coordinates.x)
+
+    @property
+    def y(self):
+        return str(self.coordinates.y)
+
     def __str__(self):
-        return self.address.organisation
+        return "{organisation} - {city}".format(organisation=self.organisation,
+                                                city=self.city)
 
 
 class CourseEvent(models.Model):
@@ -170,6 +198,8 @@ class CourseEvent(models.Model):
             default=1000
     )
 
+    lectors = models.ManyToManyField(Lector)
+
     @property
     def vat_regular(self):
         global VAT
@@ -190,6 +220,9 @@ class CourseEvent(models.Model):
             "date": self.date,
             "level": self.course_type.level
         }
+
+    def __str2__(self):
+        return "{}-{}".format(self.course_type.title, self.date)
 
     def __str__(self):
         return "{} ({})".format(
@@ -362,10 +395,6 @@ class CourseAttendee(models.Model):
     next_topics = models.TextField(
             blank=True,
             verbose_name=_("Témata dalších kurzu"))
-
-    certificate = models.FileField(
-            blank=True,
-            verbose_name=_("Certifikát"))
 
     token = models.CharField(
         max_length=255,
