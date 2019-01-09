@@ -93,19 +93,19 @@ def get_invoices(modeladmin, request, queryset):
     wb = Workbook()
     ws = wb["Sheet"]
     ws.append([
-        "id", "částka (bez DPH)", "organizace", "adresa", "IČ", "DIČ",
-        "objednavka", "kontaktni email", "text faktury", "seznam účastníků"
+        "id", "kontaktni email", "organizace", "adresa", "IČ", "DIČ",
+        "č.obj.", "částka (bez DPH)", "text faktury", "seznam účastníků"
     ])
     for invoice in invoices:
         row = [
             invoice.pk,
-            invoice.amount,
+            invoice.email,            
             invoice.name,
             invoice.address,
             invoice.ico,
             invoice.dic,
             invoice.order,
-            invoice.email,
+            invoice.amount,
             invoice.text,
             ", ".join([ca.attendee.name for ca in
                        CourseAttendee.objects.filter(invoice_detail=invoice)]),
@@ -187,7 +187,7 @@ class CourseAttendeeAdmin(admin.ModelAdmin):
                     "attended")
 
     search_fields = ("attendee__name", "attendee__email", "invoice_detail__name")
-    list_filter = ("student", "course", "invoice_detail__name")
+    list_filter = ("student", "course")
     raw_id_fields = ("invoice_detail",)
     list_editable = ('attended',)
 
@@ -215,7 +215,7 @@ class InvoiceDetailAdmin(admin.ModelAdmin):
     search_fields = ("name", "order", "email", "ico")
 
     inlines = (CourseAttendeeInline, )
-    list_filter = (InvoiceDateFilter, "order", "name" )
+    list_filter = (InvoiceDateFilter, "order")
 
     readonly_fields = ("amount", "text", )
 
