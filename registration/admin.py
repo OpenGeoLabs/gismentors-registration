@@ -95,7 +95,7 @@ def get_invoices(modeladmin, request, queryset):
     ws.append([
         "id", "kontaktni email", "organizace", "adresa", "IČ", "DIČ",
         "č.obj.", "částka (bez DPH)", "text faktury", "seznam účastníků",
-        "datum splatnosti"
+        "datum splatnosti", "poznámka"
     ])
     for invoice in invoices:
         row = [
@@ -110,14 +110,16 @@ def get_invoices(modeladmin, request, queryset):
             invoice.text,
             ", ".join([ca.attendee.name for ca in
                        CourseAttendee.objects.filter(invoice_detail=invoice)]),
-            (course_event.date + datetime.timedelta(-1)).strftime("%d.%m.%Y")
+            (course_event.date + datetime.timedelta(-1)).strftime("%d.%m.%Y"),
+            invoice.note
         ]
         ws.append(row)
 
     def set_font(c):
         ws[c+"1"].font = Font(bold=True,)
         return True
-    list(map(set_font, ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]))
+    list(map(set_font, ["A", "B", "C", "D", "E", "F",
+                        "G", "H", "I", "J", "K", "L"]))
     tmp_file_name = tempfile.mktemp(prefix="gismentors-registrace-faktury-")
     wb.save(tmp_file_name)
 

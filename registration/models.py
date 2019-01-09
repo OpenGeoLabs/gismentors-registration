@@ -272,6 +272,10 @@ class InvoiceDetail(models.Model):
             blank=True,
             verbose_name=_("Faktura"))
 
+    note = models.TextField(
+            blank=True,
+            verbose_name=_("Poznámka"))
+
     @property
     def amount(self):
         """Count sum of all course_attendees
