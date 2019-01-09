@@ -290,8 +290,13 @@ class InvoiceDetail(models.Model):
         # invoice_text = "{} - {} {}".format(course_event.course_type.title,
         #                                level, course_event.date)
         attendees = CourseAttendee.objects.filter(invoice_detail=self)
-        courses = set(str(att.course.course_type.long_str) for att in
-                      attendees)
+        courses = set(
+            "{} - {}".format(
+                att.course.course_type.long_str,
+                att.course.date.strftime("%d.%m.%Y")
+            )
+            for att in attendees
+        )
         return ", ".join(courses)
 
     def __str__(self):
