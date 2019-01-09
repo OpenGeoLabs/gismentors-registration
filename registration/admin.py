@@ -94,12 +94,13 @@ def get_invoices(modeladmin, request, queryset):
     ws = wb["Sheet"]
     ws.append([
         "id", "kontaktni email", "organizace", "adresa", "IČ", "DIČ",
-        "č.obj.", "částka (bez DPH)", "text faktury", "seznam účastníků"
+        "č.obj.", "částka (bez DPH)", "text faktury", "seznam účastníků",
+        "datum splatnosti"
     ])
     for invoice in invoices:
         row = [
             invoice.pk,
-            invoice.email,            
+            invoice.email,
             invoice.name,
             invoice.address,
             invoice.ico,
@@ -109,6 +110,7 @@ def get_invoices(modeladmin, request, queryset):
             invoice.text,
             ", ".join([ca.attendee.name for ca in
                        CourseAttendee.objects.filter(invoice_detail=invoice)]),
+            (course_event.date + datetime.timedelta(-1)).strftime("%d.%m.%Y")
         ]
         ws.append(row)
 
