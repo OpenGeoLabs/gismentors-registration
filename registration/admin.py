@@ -188,7 +188,7 @@ class CourseAdmin(admin.ModelAdmin):
 
 class CourseAttendeeAdmin(admin.ModelAdmin):
     list_display = ("attendee_name", "attendee_email", "organisation", "student", "course_id",
-                    "attended")
+                    "attended", "note")
 
     search_fields = ("attendee__name", "attendee__email", "invoice_detail__name")
     list_filter = ("student", "course")
@@ -215,13 +215,13 @@ class CourseAttendeeAdmin(admin.ModelAdmin):
 
 class InvoiceDetailAdmin(admin.ModelAdmin):
     list_display = ("organisation", "course_id", "amount", "address", "ico",
-                    "dic", "order", "email", "note")
-    search_fields = ("name", "order", "email", "ico")
+                    "dic", "order", "email", "note", "attendee_notes")
+    search_fields = ("name", "order", "email", "ico", "attendee_notes")
 
     inlines = (CourseAttendeeInline, )
     list_filter = (InvoiceDateFilter, "order")
 
-    readonly_fields = ("amount", "text", )
+    readonly_fields = ("amount", "text", "attendee_notes", )
 
     def organisation(self, invoice_detail):
         return invoice_detail.name

@@ -287,6 +287,16 @@ class InvoiceDetail(models.Model):
         return amount
 
     @property
+    def attendee_notes(self):
+        """Note from all attendees
+        """
+
+        attendees = CourseAttendee.objects.filter(invoice_detail=self)
+        notes = [att.note for att in attendees]
+
+        return "\n".join(notes)
+
+    @property
     def text(self):
         """Get list of all courses
         """
