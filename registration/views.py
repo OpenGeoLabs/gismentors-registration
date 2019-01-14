@@ -225,7 +225,6 @@ def _register_new_attendee(request, course_id):
             ico=request.POST["ico"],
             dic=request.POST["dic"],
             order=request.POST["order"],
-            text=invoice_text,
             email=invoicemail
         )
 
