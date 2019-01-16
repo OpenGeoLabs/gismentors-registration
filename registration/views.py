@@ -2,13 +2,14 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.core.mail import send_mail
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, SuspiciousOperation
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.template.loader import get_template
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles import finders
 from django.template.defaultfilters import date as _date
+from django.views import defaults
 
 import datetime
 import uuid
@@ -123,8 +124,7 @@ def _register_new_attendee(request, course_id):
     # Validate the form: the captcha field will automatically
     # check the input
     if not form.is_valid():
-        # return defaults.bad_request(request,
-        # SuspiciousOperation("Form not valid"))
+        return defaults.bad_request(request, SuspiciousOperation("Form not valid"))
         pass
 
     name = request.POST["name"]
