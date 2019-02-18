@@ -2,28 +2,34 @@
 \usepackage{graphicx}
 \usepackage[czech]{babel}
 \usepackage[utf8]{inputenc}
-\usepackage{a4wide}
+\usepackage[a4paper,left=2.5cm, right=2.5cm, top=4cm, bottom=1.5cm]{geometry}
 
 \begin{document}
 \pagestyle{empty}
+
 \begin{center}
 
 {\Large GISMentors}
 
-{\Huge Osvědčení}
+\textbf{\Huge Osvědčení}
 
-{\Large \VAR{name} }
+\vfil
 
-    úspěšně absolvoval(a)
+{\Large \VAR{name}}
 
-    \includegraphics[width=0.30\textwidth]{\VAR{logo}}
+úspěšně absolvoval(a) kurz
 
-{\Large \VAR{course_title} }
+\includegraphics[width=0.30\textwidth]{\VAR{logo}}
 
-    \VAR{place} dne \VAR{date}
+{\Large \VAR{course_title}}
+
+\VAR{place} dne \VAR{date}
+
 \end{center}
 
-Náplň školení:
+\vfil
+
+\textbf{Náplň školení:}
 
 \begin{itemize}
     \BLOCK{ for item in content }
@@ -31,22 +37,27 @@ Náplň školení:
     \BLOCK{ endfor }
 \end{itemize}
 
-\vfill
+\vfil
+
 \parbox{7cm}{
-        Školitelé: \\
+        \textbf{Školitelé:} \\
 
         \BLOCK{ for lector in lectors }
         \VAR{lector} \\
+        \vfil
         \BLOCK{ endfor }
 }
 \hfill
 \parbox{3cm}{
-        \includegraphics[width=3cm]{logo-by-opengeolabs.png}
+        \includegraphics[width=3.5cm]{logo_labels.png}
 }
 
+\vfil
 
 \begin{center}
-{\footnotesize Obsah školení je dostupný na adrese \VAR{materialy} }
+{\footnotesize Obsah školení je dostupný na adrese http://gismentors.cz/skoleni/qgis/
+\\Školení GISMentors zajištuje firma OpenGeoLabs s.r.o., Brandlova 1559/7, 149 00 Praha 4
+}
 \end{center}
 
 \end{document}
