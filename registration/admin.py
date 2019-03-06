@@ -10,6 +10,7 @@ from leaflet.admin import LeafletGeoAdmin
 import os
 import shutil
 import tempfile
+import csv
 
 from .models import CourseType
 from .models import CourseEvent
@@ -132,15 +133,39 @@ def get_invoices(modeladmin, request, queryset):
     return response
 
 
+def get_csv(modeladmin, request, queryset):
+    course_event = queryset[0]
+    attendees = CourseAttendee.objects.filter(course=course_event)
+    file_name = "{}-{}.csv".format(course_event.course_type.title,
+                                   course_event.date)
+    tmp_file_name = tempfile.mktemp(prefix="gismentors-registrace-csv-",
+                                    suffix=".csv")
+
+    with open(tmp_file_name, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+
+        for attendee in attendees:
+            writer.writerow([attendee.attendee.name])
+
+    with open(tmp_file_name, 'r') as mywb:
+        response = HttpResponse(mywb.read())
+        response['Content-Disposition'] = \
+            'attachment; filename={}'.format(file_name)
+        response['Content-Type'] = "text/csv"
+    os.remove(tmp_file_name)
+    return response
+
+
 get_certificates.short_description = _("Stáhnout certifikáty")
 get_invoices.short_description = _("Stáhnout XLSX pro faktury")
+get_csv.short_description = _("Stáhnout CSV soubor s účastníky")
 
 
 class CourseEventAdmin(admin.ModelAdmin):
     inlines = [CourseAttendeeInline]
     list_display = ("course_name", "level", "date", "early_date",
                     "attendees", "days_left", "status", "amount")
-    actions = [get_certificates, get_invoices]
+    actions = [get_certificates, get_invoices, get_csv]
 
     list_filter = (DateFilter, )
 
