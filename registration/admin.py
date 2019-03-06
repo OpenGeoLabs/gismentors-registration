@@ -157,8 +157,8 @@ def get_csv(modeladmin, request, queryset):
 
 
 get_certificates.short_description = _("Stáhnout certifikáty")
+get_csv.short_description = _("Stáhnout CSV seznam účastníků")
 get_invoices.short_description = _("Stáhnout XLSX pro faktury")
-get_csv.short_description = _("Stáhnout CSV soubor s účastníky")
 
 
 class CourseEventAdmin(admin.ModelAdmin):
