@@ -370,6 +370,8 @@ def get_certificates_zip(course_id):
              course_event.course_type.image.name)
     copyfile(finders.find("logo_labels.png"),
              "logo_labels.png")
+    copyfile(finders.find("Makefile"),
+             "Makefile")
 
     content = [l.strip() for l in
                course_event.course_type.certificate_content.split("\n")]
@@ -385,7 +387,7 @@ def get_certificates_zip(course_id):
                 "course_title": course_event.course_type.long_str,
                 "logo": course_event.course_type.image.name,
                 "place": course_event.location.postal_code,
-                "date": _date(course_event.date, "d. E Y"),
+                "date": _date(course_event.date, "j. E Y"),
                 "content": content,
                 "lectors": [lector.name for lector in course_event.lectors.all()],
                 "detail": course_event.course_type.detail,
@@ -402,6 +404,8 @@ def get_certificates_zip(course_id):
 
             myzip.write(os.path.basename(file_name))
         myzip.write("logo_labels.png")
+        
+        myzip.write("Makefile")
 
     return (temp_file, temp_dir)
 
