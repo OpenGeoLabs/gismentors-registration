@@ -133,12 +133,14 @@ class CourseEvent(models.Model):
     PUBLISHED = "published"
     CLOSED = "closed"
     DECLINED = "declined"
+    PAST = "past"
 
     status_choices = (
         (CREATED, "Vytvořený"),
         (PUBLISHED, "Publikovaný"),
         (CLOSED, "Uzavřený"),
         (DECLINED, "Zrušený"),
+        (PAST, "Uplynulý"),
     )
 
     status = models.CharField(
@@ -154,6 +156,8 @@ class CourseEvent(models.Model):
                     <dt>Zrušený</dt>
                     <dd>Kurz se ukazuje v naší nabídce kurzů, ale označený jako
                     zrušený.</dd>
+                    <dt>Uplynulý</dt>
+                    <dd>Kurz již proběhl - neukazuje se v naší veřejné nabídce kurzů.</dd>
                     </dl>
                                 """)
     )

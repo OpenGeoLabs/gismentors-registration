@@ -56,7 +56,7 @@ def courses(request):
         latest_courses_list = latest_courses_list.exclude(course_type__title__contains=settings.TEST_TITLE)
 
     context = {
-        'latest_courses_list': latest_courses_list,
+        "latest_courses_list": latest_courses_list,
         "level_choices": CourseType.level_choices
     }
     return render(request, "courses.html", context)
@@ -251,7 +251,7 @@ def _send_mails(course_event, attendee, level,
     """
 
     suma = sum([
-        int(attendee.invoice_detail.amount) for attendee in
+        int(attendee.amount) for attendee in
         course_event.courseattendee_set.all()
     ])
 
@@ -404,7 +404,7 @@ def get_certificates_zip(course_id):
 
             myzip.write(os.path.basename(file_name))
         myzip.write("logo_labels.png")
-        
+
         myzip.write("Makefile")
 
     return (temp_file, temp_dir)
