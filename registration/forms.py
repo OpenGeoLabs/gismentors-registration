@@ -21,7 +21,7 @@ class RegistrationForm(forms.Form):
                      budeme řešit organizační záležitosti kurzu.''')
 
     organisation = forms.CharField(
-        required=False, max_length=50, label=_('Organizace'))
+        required=False, max_length=100, label=_('Organizace'))
 
     street = forms.CharField(label=_('Ulice a číslo popisné'),
                              max_length=50)
