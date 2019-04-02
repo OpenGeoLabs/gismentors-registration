@@ -246,7 +246,7 @@ def _register_new_attendee(request, course_id):
 
 
 def _send_mails(course_event, attendee, level,
-                organisation, note, amount, is_test=False):
+                organisation, amount, is_test=False):
     """Send e-mails to info at gismentors and to new course attendee
     """
 
@@ -267,7 +267,6 @@ def _send_mails(course_event, attendee, level,
             Účastník: {}
             E-mail: {}
             Organizace: {}
-            Poznámka: {}
             Celkem registrovaných účastníků: {}
             Celkem peněz (bez DPH): {}
             """.format(
@@ -275,7 +274,6 @@ def _send_mails(course_event, attendee, level,
                 attendee.name,
                 attendee.email,
                 organisation,
-                note,
                 len(course_event.courseattendee_set.all()),
                 suma
             ),
@@ -295,7 +293,6 @@ def _send_mails(course_event, attendee, level,
             Účastník: {}
             E-mail: {}
             Organizace: {}
-            Poznámka: {}            
             Celkem registrovaných účastníků: {}
             Celkem peněz (bez DPH): {}
             """.format(
@@ -303,7 +300,6 @@ def _send_mails(course_event, attendee, level,
                 attendee.name,
                 attendee.email,
                 organisation,
-                note,
                 len(course_event.courseattendee_set.all()),
                 suma
             ),
