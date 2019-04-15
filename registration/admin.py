@@ -246,7 +246,7 @@ class InvoiceDetailAdmin(admin.ModelAdmin):
     inlines = (CourseAttendeeInline, )
     list_filter = (InvoiceDateFilter, "order")
 
-    readonly_fields = ("amount", "text", "attendee_notes", )
+    readonly_fields = ("amount", "text", "attendee_notes", "uuid")
 
     def organisation(self, invoice_detail):
         return invoice_detail.name

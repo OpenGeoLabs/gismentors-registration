@@ -5,8 +5,10 @@ import uuid
 from django.conf import settings
 from django.utils.safestring import mark_safe
 import datetime
+import os
 
 VAT=1.21
+
 
 class Lector(models.Model):
     class Meta:
@@ -21,6 +23,11 @@ class Lector(models.Model):
     def __str__(self):
         return self.name
 
+
+def call_logo_path(instance, filename):
+    return instance.logo_path(filename)
+
+
 class CourseType(models.Model):
     class Meta:
         verbose_name = _("Typ kurzu")
@@ -31,6 +38,8 @@ class CourseType(models.Model):
             verbose_name=_("Název"))
 
     image = models.ImageField(
+            upload_to=call_logo_path,
+            max_length=256,
             verbose_name=_("Logo"))
 
     level_choices = (
@@ -69,6 +78,16 @@ class CourseType(models.Model):
 
         level = dict(self.level_choices)[self.level]
         return "{} - {}".format(self.title, level)
+
+    def logo_path(self, filename):
+
+        os.umask(0)
+        path = "registration/coursetype/"
+        complete_path = os.path.join(settings.MEDIA_ROOT, path)
+        if settings.DEFAULT_FILE_STORAGE == "django.core.files.storage.FileSystemStorage":
+            if not os.path.exists(complete_path):
+                os.makedirs(complete_path, 0o777)
+        return os.path.join(path, filename)
 
     def __str__(self):
 
@@ -244,6 +263,10 @@ class CourseEvent(models.Model):
             self.course_type.__str__(), self.date)
 
 
+def call_invoice_path(instance, filename):
+    return instance.invoice_path(filename)
+
+
 class InvoiceDetail(models.Model):
     class Meta:
         verbose_name = _("Faktura")
@@ -281,11 +304,18 @@ class InvoiceDetail(models.Model):
 
     invoice = models.FileField(
             blank=True,
+            max_length=256,
+            upload_to=call_invoice_path,
             verbose_name=_("Faktura"))
 
     note = models.TextField(
             blank=True,
             verbose_name=_("Poznámka"))
+
+    uuid = models.TextField(
+            blank=True,
+            verbose_name=_("UUID"),
+            default="")
 
     @property
     def amount(self):
@@ -329,6 +359,21 @@ class InvoiceDetail(models.Model):
             str(self.id)
         else:
             return self.name
+
+    def invoice_path(self, filename):
+
+        os.umask(0)
+        path = "registration/invoices/{uuid}/".format(uuid=self.uuid)
+        complete_path = os.path.join(settings.MEDIA_ROOT, path)
+        if settings.DEFAULT_FILE_STORAGE == "django.core.files.storage.FileSystemStorage":
+            if not os.path.exists(complete_path):
+                os.makedirs(complete_path, 0o777)
+        return os.path.join(path, filename)
+
+    def save(self, *args, **kwargs):
+        if not self.uuid:
+            self.uuid = uuid.uuid4()
+        return super(InvoiceDetail, self).save(*args, **kwargs)
 
 
 class Attendee(models.Model):
