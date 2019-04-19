@@ -12,11 +12,13 @@ class Command(BaseCommand):
 
         for evt in CourseEvent.objects.all():
 
-            if (today - evt.date).days == 0:
-                evt.status = CourseEvent.PAST
-                evt.save()
+            if evt.status == CourseEvent.PUBLISHED or evt.status == CourseEvent.CLOSED:
 
-                self.stdout.write(
-                    self.style.SUCCESS('Course {} set status to {}'.format(
-                        str(evt), evt.status))
-                )
+                if (today - evt.date).days >= 0:
+                    evt.status = CourseEvent.PAST
+                    evt.save()
+
+                    self.stdout.write(
+                        self.style.SUCCESS('Course {} set status to {}'.format(
+                            str(evt), evt.status))
+                    )
