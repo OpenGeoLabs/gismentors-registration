@@ -360,18 +360,13 @@ def get_certificates_zip(course_id):
 
     certificate_template = latex_jinja_env.get_template("certificate.tex")
 
-    print("copyfile", course_event.course_type.image.path,
-        os.path.join(temp_dir, course_event.course_type.image.name))
     copyfile(
         course_event.course_type.image.path,
-        os.path.join(temp_dir, course_event.course_type.image.name)
+        os.path.join(temp_dir,
+                     os.path.basename(course_event.course_type.image.name))
     )
 
     os.chdir(temp_dir)
-    print("copyfile", course_event.course_type.image.path,
-             course_event.course_type.image.name)
-    copyfile(course_event.course_type.image.path,
-             course_event.course_type.image.name)
     copyfile(finders.find("logo_labels.png"),
              "logo_labels.png")
     copyfile(finders.find("Makefile"),
@@ -382,7 +377,7 @@ def get_certificates_zip(course_id):
 
     with zipfile.ZipFile(temp_file, 'w') as myzip:
 
-        myzip.write(course_event.course_type.image.name)
+        myzip.write(os.path.basename(course_event.course_type.image.name))
 
         for attendee in attendees:
 

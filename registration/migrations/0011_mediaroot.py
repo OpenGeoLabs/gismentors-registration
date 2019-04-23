@@ -33,7 +33,7 @@ def move_files(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('registration', '0008_faktury'),
+        ('registration', '0009_automatic_earlydate'),
     ]
 
     operations = [
