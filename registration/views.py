@@ -360,12 +360,16 @@ def get_certificates_zip(course_id):
 
     certificate_template = latex_jinja_env.get_template("certificate.tex")
 
+    print("copyfile", course_event.course_type.image.path,
+        os.path.join(temp_dir, course_event.course_type.image.name))
     copyfile(
         course_event.course_type.image.path,
         os.path.join(temp_dir, course_event.course_type.image.name)
     )
 
     os.chdir(temp_dir)
+    print("copyfile", course_event.course_type.image.path,
+             course_event.course_type.image.name)
     copyfile(course_event.course_type.image.path,
              course_event.course_type.image.name)
     copyfile(finders.find("logo_labels.png"),

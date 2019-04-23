@@ -11,20 +11,23 @@ import shutil
 
 def move_files(apps, schema_editor):
     for invoice in InvoiceDetail.objects.exclude(invoice=''):
-        invoice.uuid = uuid.uuid4()
-        invoice.save()
         file_name = invoice.invoice.name
         orig = os.path.join(settings.MEDIA_ROOT, file_name)
         new = invoice.invoice_path(file_name)
         shutil.move(orig, os.path.join(settings.MEDIA_ROOT, new))
 
+        invoice.invoice = new
+        invoice.uuid = uuid.uuid4()
+        invoice.save()
+
     for ctype in CourseType.objects.exclude(image=''):
-        ctype.uuid = uuid.uuid4()
-        ctype.save()
         file_name = ctype.image.name
         orig = os.path.join(settings.MEDIA_ROOT, file_name)
         new = ctype.logo_path(file_name)
         shutil.move(orig, os.path.join(settings.MEDIA_ROOT, new))
+
+        ctype.image = new
+        ctype.save()
 
 
 class Migration(migrations.Migration):

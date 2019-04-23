@@ -87,6 +87,7 @@ class CourseType(models.Model):
         if settings.DEFAULT_FILE_STORAGE == "django.core.files.storage.FileSystemStorage":
             if not os.path.exists(complete_path):
                 os.makedirs(complete_path, 0o777)
+        print("get_logo_path", os.path.join(path, filename))
         return os.path.join(path, filename)
 
     def __str__(self):
