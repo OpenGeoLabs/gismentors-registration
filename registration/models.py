@@ -4,6 +4,7 @@ from django.contrib.gis.db import models as gismodels
 import uuid
 from django.conf import settings
 from django.utils.safestring import mark_safe
+import datetime
 
 VAT=1.21
 
@@ -167,7 +168,8 @@ class CourseEvent(models.Model):
     )
 
     early_date = models.DateField(
-            verbose_name=_("Včasná registrace")
+        blank=True,
+        verbose_name=_("Včasná registrace")
     )
 
     location = models.ForeignKey(
@@ -228,6 +230,11 @@ class CourseEvent(models.Model):
             "date": self.date,
             "level": self.course_type.level
         }
+
+    def save(self, *args, **kwargs):
+        if not self.early_date:
+            self.early_date = self.date - datetime.timedelta(16)
+        return super(CourseEvent, self).save(*args, **kwargs)
 
     def __str2__(self):
         return "{}-{}".format(self.course_type.title, self.date)
