@@ -268,7 +268,7 @@ def _send_mails(course_event, attendee, level,
             E-mail: {}
             Organizace: {}
             Celkem registrovaných účastníků: {}
-            Celkem peněz (bez DPH): {}
+            Celkem peněz (s DPH): {}
             """.format(
                 course_event.course_type.title,
                 attendee.name,
@@ -294,7 +294,7 @@ def _send_mails(course_event, attendee, level,
             E-mail: {}
             Organizace: {}
             Celkem registrovaných účastníků: {}
-            Celkem peněz (bez DPH): {}
+            Celkem peněz (s DPH): {}
             """.format(
                 course_event.course_type.title,
                 attendee.name,
@@ -314,7 +314,7 @@ def _send_mails(course_event, attendee, level,
             'name': attendee.name,
             "title": "{} - {}".format(course_event.course_type.title, level),
             "date": course_event.date,
-            "amount": int(amount*VAT)
+            "amount": int(amount)
         }),
         'info@gismentors.cz',
         [attendee.email],

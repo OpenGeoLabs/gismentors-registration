@@ -185,43 +185,43 @@ class CourseEvent(models.Model):
 
     price_regular = models.IntegerField(
             verbose_name="Včasná registrace",
-            help_text=_("""Kč, bez DPH <br/>
+            help_text=_("""Kč, s DPH <br/>
         <dl>
-        <dt>Začátečník</dt><dd> 4000</dd>
-        <dt>Pokročilý</dt><dd> 6000</dd>
+        <dt>Začátečník</dt><dd> 5000</dd>
+        <dt>Pokročilý</dt><dd> 7500</dd>
         </dl>""")
     )
 
     price_late = models.IntegerField(
             verbose_name="Standardní",
-            help_text=_("""Kč, bez DPH<br />
+            help_text=_("""Kč, s DPH<br/>
         <dl>
-        <dt>Začátečník</dt><dd>5000</dd>
-        <dt>Pokročilý</dt><dd>7000</dd>
+        <dt>Začátečník</dt><dd>6000</dd>
+        <dt>Pokročilý</dt><dd>8500</dd>
         </dl>
         """)
     )
 
     price_student = models.IntegerField(
             verbose_name="Studentská",
-            help_text=_("""Kč, bez DPH"""),
-            default=1000
+            help_text=_("""Kč, s DPH"""),
+            default=1500
     )
 
     lectors = models.ManyToManyField(Lector)
 
     @property
     def vat_regular(self):
-        global VAT
-        return int(VAT*self.price_regular)
+        return int(self.price_regular)
 
     @property
     def vat_late(self):
-        return int(VAT*self.price_late)
+        return int(self.price_late)
 
     @property
     def vat_student(self):
-        return int(VAT*self.price_student)
+        return int(self.price_student)
+
 
     @property
     def json(self):
