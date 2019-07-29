@@ -9,11 +9,11 @@ from captcha.fields import CaptchaField
 
 class RegistrationForm(forms.Form):
 
-    captcha = CaptchaField(help_text="Opište text na obrázku")
+    captcha = CaptchaField(help_text="Opište text na obrázku.")
 
     name = forms.CharField(
         label=_('Jméno a příjmení'), max_length=255,
-        help_text="""Jméno a příjmení včetně titulů""")
+        help_text="""Jméno a příjmení včetně titulů.""")
 
     email_attendee = forms.EmailField(
         label=_('E-mail účastníka'),
@@ -39,7 +39,7 @@ class RegistrationForm(forms.Form):
 
     invoicemail = forms.EmailField(
         label=_('Fakturační e-mail'), required=False,
-        help_text="Pokud se liší od e-mailu účastníka")
+        help_text="Pokud se liší od e-mailu účastníka.")
 
     student = forms.BooleanField(
         required=False,
@@ -64,7 +64,7 @@ class RegistrationForm(forms.Form):
     note = forms.CharField(
         label=_('Poznámka pro organizátory'), required=False,
         widget=forms.Textarea,
-        help_text="Cokoliv nám chcete sdělit")
+        help_text="Cokoliv nám chcete sdělit.")
 
     gdpr = forms.BooleanField(
         label=Attendee.gdpr_label,
