@@ -5,7 +5,7 @@ tímto potvrzujeme Vaši přihlášku na kurz GISMentors.
 Jméno: {{ name }}
 Kurz: {{ title }}
 Datum: {{ date }}
-Cena: {{ amount }} Kč (včetně DPH)
+Cena: {{ amount }} Kč (s DPH)
 
 Detailní propozice a informace k platbě Vám zašleme e-mailem nejpozději 2 týdny před konáním kurzu.
 V případě malého zájmu si vyhrazujeme právo kurz zrušit. I tuto informaci Vám sdělíme e-mailem nejpozději 2 týdny před konáním kurzu.

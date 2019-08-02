@@ -19,7 +19,6 @@ import zipfile
 from shutil import copyfile
 import jinja2
 
-from .models import VAT
 from .models import CourseType
 from .models import CourseEvent
 from .models import Attendee
@@ -246,14 +245,9 @@ def _register_new_attendee(request, course_id):
 
 
 def _send_mails(course_event, attendee, level,
-                organisation, amount, is_test=False):
+                organisation, amount, suma_netto, is_test=False):
     """Send e-mails to info at gismentors and to new course attendee
     """
-
-    suma = sum([
-        int(attendee.amount) for attendee in
-        course_event.courseattendee_set.all()
-    ])
 
     if is_test:
 
@@ -268,14 +262,14 @@ def _send_mails(course_event, attendee, level,
             E-mail: {}
             Organizace: {}
             Celkem registrovaných účastníků: {}
-            Celkem peněz (s DPH): {}
+            Celkem peněz (bez DPH): {}
             """.format(
                 course_event.course_type.title,
                 attendee.name,
                 attendee.email,
                 organisation,
                 len(course_event.courseattendee_set.all()),
-                suma
+                suma_netto
             ),
             'info@gismentors.cz',
             [settings.TEST_MAIL],
@@ -294,14 +288,14 @@ def _send_mails(course_event, attendee, level,
             E-mail: {}
             Organizace: {}
             Celkem registrovaných účastníků: {}
-            Celkem peněz (s DPH): {}
+            Celkem peněz (bez DPH): {}
             """.format(
                 course_event.course_type.title,
                 attendee.name,
                 attendee.email,
                 organisation,
                 len(course_event.courseattendee_set.all()),
-                suma
+                suma_netto
             ),
             'info@gismentors.cz',
             [settings.INFO_MAIL],

@@ -12,6 +12,7 @@ import shutil
 import tempfile
 import csv
 
+from .models import VAT
 from .models import CourseType
 from .models import CourseEvent
 from .models import InvoiceDetail
@@ -95,7 +96,7 @@ def get_invoices(modeladmin, request, queryset):
     ws = wb["Sheet"]
     ws.append([
         "id", "kontaktni email", "organizace", "adresa", "IČ", "DIČ",
-        "č.obj.", "částka (bez DPH)", "text faktury", "seznam účastníků",
+        "č.obj.", "částka (s DPH)", "text faktury", "seznam účastníků",
         "datum splatnosti", "poznámka"
     ])
     for invoice in invoices:
@@ -164,14 +165,14 @@ get_invoices.short_description = _("Stáhnout XLSX pro faktury")
 class CourseEventAdmin(admin.ModelAdmin):
     inlines = [CourseAttendeeInline]
     list_display = ("course_name", "level", "date", "early_date",
-                    "attendees", "days_left", "status", "amount")
+                    "attendees", "days_left", "status", "suma_netto")
     actions = [get_certificates, get_invoices, get_csv]
 
     list_filter = (DateFilter, )
 
-    def amount(self, ce):
+    def suma_netto(self, ce):
         attendees = CourseAttendee.objects.filter(course=ce)
-        return sum(att.amount for att in attendees)
+        return int(sum(att.amount for att in attendees)/VAT)
 
     def course_name(self, ce):
         return ce.course_type.title

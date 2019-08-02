@@ -502,8 +502,7 @@ class CourseAttendee(models.Model):
         on_delete=models.PROTECT)
 
     amount = models.IntegerField(
-            verbose_name=_("Částka"),
-            help_text="Částka bez DPH")
+            verbose_name=_("Částka (s DPH)"))
 
     attended = models.BooleanField(default=False)
 
