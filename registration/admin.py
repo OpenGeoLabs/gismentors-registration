@@ -242,7 +242,7 @@ class CourseAttendeeAdmin(admin.ModelAdmin):
 class InvoiceDetailAdmin(admin.ModelAdmin):
     list_display = ("organisation", "course_id", "amount", "address", "ico",
                     "dic", "order", "email", "note", "attendee_notes")
-    search_fields = ("name", "order", "email", "ico", "attendee_notes")
+    search_fields = ("name", "order", "email", "ico")
 
     inlines = (CourseAttendeeInline, )
     list_filter = (InvoiceDateFilter, "order")
