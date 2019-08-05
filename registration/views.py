@@ -245,7 +245,7 @@ def _register_new_attendee(request, course_id):
 
 
 def _send_mails(course_event, attendee, level,
-                organisation, amount, suma_netto, is_test=False):
+                organisation, amount, is_test=False):
     """Send e-mails to info at gismentors and to new course attendee
     """
 
@@ -269,7 +269,7 @@ def _send_mails(course_event, attendee, level,
                 attendee.email,
                 organisation,
                 len(course_event.courseattendee_set.all()),
-                suma_netto
+                course_event.suma_netto
             ),
             'info@gismentors.cz',
             [settings.TEST_MAIL],
@@ -295,7 +295,7 @@ def _send_mails(course_event, attendee, level,
                 attendee.email,
                 organisation,
                 len(course_event.courseattendee_set.all()),
-                suma_netto
+                course_event.suma_netto
             ),
             'info@gismentors.cz',
             [settings.INFO_MAIL],

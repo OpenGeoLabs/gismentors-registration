@@ -170,10 +170,6 @@ class CourseEventAdmin(admin.ModelAdmin):
 
     list_filter = (DateFilter, )
 
-    def suma_netto(self, ce):
-        attendees = CourseAttendee.objects.filter(course=ce)
-        return int(sum(att.amount for att in attendees)/VAT)
-
     def course_name(self, ce):
         return ce.course_type.title
 

@@ -251,6 +251,12 @@ class CourseEvent(models.Model):
             "level": self.course_type.level
         }
 
+    @property
+    def suma_netto(self):
+        attendees = CourseAttendee.objects.filter(course=self)
+        return int(sum(att.amount for att in attendees)/VAT)
+
+
     def save(self, *args, **kwargs):
         if not self.early_date:
             self.early_date = self.date - datetime.timedelta(16)
