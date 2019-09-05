@@ -26,12 +26,14 @@
                 <a href="{{ course.course_type.detail }}" target="_blank">
                     <img class="course_type" src="{{ course.course_type.image.url }}" />
                     {{ course.course_type.title }}
+                {% if course.course_type.level %}
                 -
                 {% for key, value in level_choices %}
                     {% if key == course.course_type.level %}
                         {{ value }}
                     {% endif %}
                 {% endfor %}
+                {% endif %}
                 </a>
             </td>
             <td>

@@ -49,6 +49,8 @@ class CourseType(models.Model):
 
     level = models.IntegerField(
             verbose_name=_("Úroveň"),
+            null=True,
+            blank=True,
             choices=level_choices)
 
     description = models.TextField(
@@ -76,8 +78,12 @@ class CourseType(models.Model):
     @property
     def long_str(self):
 
-        level = dict(self.level_choices)[self.level]
-        return "{} - {}".format(self.title, level)
+
+        if self.level is not None:
+            level = dict(self.level_choices)[self.level]
+            return "{} - {}".format(self.title, level)
+        else:
+            return self.title
 
     def logo_path(self, filename):
 
@@ -92,8 +98,11 @@ class CourseType(models.Model):
 
     def __str__(self):
 
-        level = dict(self.level_choices)[self.level][0:3]
-        return "{} - {}.".format(self.title, level)
+        if self.level is not None:
+            level = dict(self.level_choices)[self.level][0:3]
+            return "{} - {}.".format(self.title, level)
+        else:
+            return self.title
 
 
 class Location(models.Model):

@@ -174,7 +174,10 @@ class CourseEventAdmin(admin.ModelAdmin):
         return ce.course_type.title
 
     def level(self, ce):
-        return ce.course_type.level_choices[ce.course_type.level][1]
+        if ce.course_type.level is not None:
+            return ce.course_type.level_choices[ce.course_type.level][1]
+        else:
+            return ""
 
     def attendees(self, ce):
         return len(CourseAttendee.objects.filter(course=ce))
@@ -230,9 +233,12 @@ class CourseAttendeeAdmin(admin.ModelAdmin):
 
         course_date = course_attendee.course.date
         course_name = course_attendee.course.course_type.title
-        course_level = course_attendee.course.course_type.level_choices[
-                       course_attendee.course.course_type.level][1]
-        return "{} - {} {}".format(course_name, course_level, course_date)
+        if course_attendee.course.course_type.level is not None:
+            course_level = course_attendee.course.course_type.level_choices[
+                        course_attendee.course.course_type.level][1]
+            return "{} - {} {}".format(course_name, course_level, course_date)
+        else:
+            return "{} {}".format(course_name, course_date)
 
 
 class InvoiceDetailAdmin(admin.ModelAdmin):
@@ -257,10 +263,13 @@ class InvoiceDetailAdmin(admin.ModelAdmin):
         if len(course_attendees) > 0:
             course_date = course_attendees[0].course.date
             course_name = course_attendees[0].course.course_type.title
-            course_level = course_attendees[0].course.course_type.level_choices[
-                        course_attendees[0].course.course_type.level][1]
+            if course_attendees[0].course.course_type.level is not None:
+                course_level = course_attendees[0].course.course_type.level_choices[
+                            course_attendees[0].course.course_type.level][1]
 
-            return "{} - {} {}".format(course_name, course_level, course_date)
+                return "{} - {} {}".format(course_name, course_level, course_date)
+            else:
+                return "{} {}".format(course_name, course_date)
         else:
             return "No attendee"
 

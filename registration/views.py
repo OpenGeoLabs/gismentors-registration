@@ -69,9 +69,13 @@ def _empty_form(request, course_id):
     if request.GET.get("env") == settings.TEST_KEY:
         test_env = settings.TEST_KEY
 
+    if course.course_type.level:
+        level = course.course_type.level_choices[course.course_type.level][1]
+    else:
+        level = ""
     context = {
         "course": course,
-        "level": course.course_type.level_choices[course.course_type.level][1],
+        "level": level,
         "form": RegistrationForm(),
         "test_env": test_env
     }
@@ -137,8 +141,11 @@ def _register_new_attendee(request, course_id):
     student = False
     amount = 0
 
-    level = list(filter(lambda c: c[0] == course_event.course_type.level,
-                 CourseType.level_choices))[0][1]
+    if course_event.course_type.level:
+        level = list(filter(lambda c: c[0] == course_event.course_type.level,
+                    CourseType.level_choices))[0][1]
+    else:
+        level = ""
 
     if "gdpr" in request.POST and request.POST["gdpr"] == "on":
         gdpr = True
@@ -155,11 +162,16 @@ def _register_new_attendee(request, course_id):
         attendee__email=email
     )
 
+    if level:
+        title = "{} - {}".format(course_event.course_type.title, level)
+    else:
+        title = course_event.course_type.title
+
     if len(existing_attendees) > 0:
         context = {
             "name": existing_attendees[0].attendee.name,
             "email": existing_attendees[0].attendee.email,
-            "title": "{} - {}".format(course_event.course_type.title, level)
+            "title": title
         }
         return render(request, "already_registered.html", context)
 
@@ -231,10 +243,10 @@ def _register_new_attendee(request, course_id):
     course_attendee.invoice_detail = invoice_detail
     course_attendee.save()
 
-    _send_mails(course_event, attendee, level, organisation, amount, is_test)
+    _send_mails(course_event, attendee, title, organisation, amount, is_test)
 
     context = {
-        "course_name": "{} - {}".format(course_event.course_type.title, level),
+        "course_name": title,
         "course_date": course_event.date,
         "attendee": attendee.name,
         "mail": attendee.email,
@@ -244,7 +256,7 @@ def _register_new_attendee(request, course_id):
     return render(request, "submitted.html", context)
 
 
-def _send_mails(course_event, attendee, level,
+def _send_mails(course_event, attendee, title,
                 organisation, amount, is_test=False):
     """Send e-mails to info at gismentors and to new course attendee
     """
@@ -252,10 +264,7 @@ def _send_mails(course_event, attendee, level,
     if is_test:
 
         send_mail(
-            '[GISMentors-kurzy] {} - {} {}'.format(
-                course_event.course_type.title,
-                level, course_event.date
-            ),
+            '[GISMentors-kurzy] {} {}'.format(title, course_event.date),
             """
             Kurz: {}
             Účastník: {}
@@ -279,9 +288,7 @@ def _send_mails(course_event, attendee, level,
     else:
 
         send_mail(
-            '[GISMentors-kurzy] {} - {} {}'.format(
-                course_event.course_type.title, level, course_event.date
-            ),
+            '[GISMentors-kurzy] {} {}'.format(title, course_event.date),
             """
             Kurz: {}
             Účastník: {}
@@ -306,7 +313,7 @@ def _send_mails(course_event, attendee, level,
         '[GISMentors-kurzy] Potvrzení přihlášky',
         render_to_string('potvrzeni.txt', {
             'name': attendee.name,
-            "title": "{} - {}".format(course_event.course_type.title, level),
+            "title": title,
             "date": course_event.date,
             "amount": int(amount)
         }),
