@@ -162,7 +162,7 @@ def _register_new_attendee(request, course_id):
         attendee__email=email
     )
 
-    if level:
+    if level is not None:
         title = "{} - {}".format(course_event.course_type.title, level)
     else:
         title = course_event.course_type.title
