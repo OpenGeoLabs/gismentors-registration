@@ -273,7 +273,7 @@ def _send_mails(course_event, attendee, title,
             Celkem registrovaných účastníků: {}
             Celkem peněz (bez DPH): {}
             """.format(
-                course_event.course_type.title,
+                title,
                 attendee.name,
                 attendee.email,
                 organisation,
@@ -297,7 +297,7 @@ def _send_mails(course_event, attendee, title,
             Celkem registrovaných účastníků: {}
             Celkem peněz (bez DPH): {}
             """.format(
-                course_event.course_type.title,
+                title,
                 attendee.name,
                 attendee.email,
                 organisation,
