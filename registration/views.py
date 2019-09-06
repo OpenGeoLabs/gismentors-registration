@@ -69,10 +69,10 @@ def _empty_form(request, course_id):
     if request.GET.get("env") == settings.TEST_KEY:
         test_env = settings.TEST_KEY
 
-    if course.course_type.level:
+    if course.course_type.level is not None:
         level = course.course_type.level_choices[course.course_type.level][1]
     else:
-        level = ""
+        level = None
     context = {
         "course": course,
         "level": level,
@@ -141,11 +141,11 @@ def _register_new_attendee(request, course_id):
     student = False
     amount = 0
 
-    if course_event.course_type.level:
+    if course_event.course_type.level is not None:
         level = list(filter(lambda c: c[0] == course_event.course_type.level,
                     CourseType.level_choices))[0][1]
     else:
-        level = ""
+        level = None
 
     if "gdpr" in request.POST and request.POST["gdpr"] == "on":
         gdpr = True
