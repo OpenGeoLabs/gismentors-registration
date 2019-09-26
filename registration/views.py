@@ -231,7 +231,7 @@ def _register_new_attendee(request, course_id):
 
     if not invoice_detail:
         invoice_detail = InvoiceDetail(
-            address="{street}\n{zipcode} - {city}".format(
+            address="{street}\n{zipcode} {city}".format(
                 street=request.POST["street"],
                 zipcode=request.POST["zip_code"],
                 city=request.POST["city"]),

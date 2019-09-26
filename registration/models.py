@@ -145,7 +145,7 @@ class Location(models.Model):
         return str(self.coordinates.y)
 
     def __str__(self):
-        return "{organisation} - {city}".format(organisation=self.organisation,
+        return "{organisation}, {city}".format(organisation=self.organisation,
                                                 city=self.city)
 
 
