@@ -56,7 +56,8 @@ def courses(request):
 
     context = {
         "latest_courses_list": latest_courses_list,
-        "level_choices": CourseType.level_choices
+        "level_choices": CourseType.level_choices,
+        "google_tag": settings.GOOGLE_TAG,
     }
     return render(request, "courses.html", context)
 
@@ -77,7 +78,8 @@ def _empty_form(request, course_id):
         "course": course,
         "level": level,
         "form": RegistrationForm(),
-        "test_env": test_env
+        "test_env": test_env,
+        "google_tag": settings.GOOGLE_TAG,
     }
 
     return render(request, "course-forms.html", context)
@@ -171,7 +173,8 @@ def _register_new_attendee(request, course_id):
         context = {
             "name": existing_attendees[0].attendee.name,
             "email": existing_attendees[0].attendee.email,
-            "title": title
+            "title": title,
+            "google_tag": settings.GOOGLE_TAG,
         }
         return render(request, "already_registered.html", context)
 
@@ -250,7 +253,8 @@ def _register_new_attendee(request, course_id):
         "course_date": course_event.date,
         "attendee": attendee.name,
         "mail": attendee.email,
-        "course_id": course_event.id
+        "course_id": course_event.id,
+        "google_tag": settings.GOOGLE_TAG,
     }
 
     return render(request, "submitted.html", context)
