@@ -16,27 +16,22 @@
 
 <div class="card">
   <div class="card-body">
-      <h1>{{ course.course_type.title }} {% if level is not none %} - {{ level }} {% endif %}</h1>
-<img class="course_logo" src="{{ course.course_type.image.url }}" />
+        <h1>Závazná přihláška na kurz {{ course.course_type.title }}{% if level is not none %} - {{ level }}{% endif %}
+        </h1> 
+            <img class="course_logo" src="{{ course.course_type.image.url }}" />
 <br>
-<div>
-Závazná přihláška na jednodenní kurz <a href="{{ course.course_type.detail }}" target="_blank">{{ course.course_type.title }}{% if level is not none %} - {{ level }}{% endif %}</a>.
-</div>
-<div>Datum: {{ course.date }}</div>
-<div>Místo konání: {{ course.location.organisation }},
+<!-- <div>Datum: {{ course.date }}</div> -->
+<div><b> Datum: </b> {{ course.date }} {% if course.note %}({{ course.note }}){% endif %}</div>
+<div><b> Místo konání: </b> {{ course.location.organisation }} {% if course.location.city %},
   {{ course.location.street }}, {{ course.location.city }}
-  <a href="https://www.openstreetmap.org/?mlat={{ course.location.y }}&mlon={{ course.location.x }}&zoom=16" target="_blank">(mapa)</a>
+  <a href="https://www.openstreetmap.org/?mlat={{ course.location.y }}&mlon={{ course.location.x }}&zoom=16" target="_blank">(mapa)</a>  {% endif %}
+</div>
+<div><b> Popis kurzu: </b> {{ course.course_type.description }} <a href="{{ course.course_type.detail }}" target="_blank">Více o kurzu {{ course.course_type.title }} {% if level is not none %} - {{ level }}{% endif %}.</a>
 </div>
 <div>
-    <small id="prices" class="form-text text-muted">Podrobné informace ke kurzům najdete na stránkách <a href="http://gismentors.cz/skoleni/info/" target="_blank">GISMentors.</a>
+    <small id="prices" class="form-text text-muted">Podrobné informace a podmínky ke kurzům najdete na stránkách <a href="http://gismentors.cz/skoleni/info/" target="_blank">GISMentors.</a>
     </small>    
 </div>
-{% if course.note %}
-<div>
-Poznámka: {{ course.note }}
-</div>
-{% endif %}
-
 
 <br>
 <div class="card border-light">

@@ -37,14 +37,13 @@
                 </a>
             </td>
             <td>
-                <strong>{{ course.date }}</strong>
+                <strong>{{ course.date }} {% if course.note %}({{ course.note }}){% endif %}</strong>
             </td>
             <td>
                 {{ course.early_date }}
             </td>
             <td>
-                {{ course.location.organisation }},
-                {{ course.location.city }}
+                {{ course.location.organisation }}{% if course.location.city %}, {{ course.location.city }} {% endif %}
             </td>
             <td>
                 {% if course.status == 'published' %}

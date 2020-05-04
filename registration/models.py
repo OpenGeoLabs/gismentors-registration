@@ -117,14 +117,17 @@ class Location(models.Model):
 
     street = models.CharField(
             default="",
+            blank=True,
             max_length=50)
 
     city = models.CharField(
             default="",
+            blank=True,
             max_length=50)
 
     postal_code = models.CharField(
             default="",
+            blank=True,
             max_length=10)
 
     coordinates = gismodels.PointField(
@@ -132,6 +135,7 @@ class Location(models.Model):
     )
 
     note = models.TextField(
+            default="",        
             blank=True,
             verbose_name=_("Poznámka")
     )
