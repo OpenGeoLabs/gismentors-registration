@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, render
+from django.http import Http404
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.core.mail import send_mail
@@ -328,6 +329,11 @@ def _send_mails(course_event, attendee, title,
 
 
 def course(request, course_id):
+
+    course_event = get_object_or_404(CourseEvent, pk=course_id)
+
+    if course_event.date <= datetime.date.today():
+        raise Http404("Kurz již proběhl. | The course took already place.")
 
     if request.POST:
         return _register_new_attendee(request, course_id)
